@@ -1,47 +1,34 @@
-# 11월 넷째 주 GitHub 별 급상승 AI·개발 도구 BEST 6
+# 11월 넷째 주 GitHub 별 급상승 AI·개발 도구 BEST 10
 
 TOP 시리즈 · 2026-11-23
 
-> 집계 기간: 2026-11-16 13:28 ~ 2026-11-23 13:28 (KST). GitHub API로 별 수를 직접 세서 만든 순위예요. GitHub 공식 트렌딩 순위가 아니에요.
-> 첫 주라 7일 전 기록이 없고 별 기록도 읽지 못해서, 이번 주에 새로 생긴 저장소만 집계했어요. 다음 주부터는 매일 기록과 비교해서 전체 후보를 집계해요.
+> 집계 기간: 2026-11-16 14:56 ~ 2026-11-23 14:56 (KST). GitHub API로 별 수를 직접 세서 만든 순위예요. GitHub 공식 트렌딩 순위가 아니에요.
 
 | 순위 | 저장소 | 별 증가 | 지난주 대비 | 라이선스 | 한 줄 | 단, 확인할 것 |
 |---|---|---|---|---|---|---|
-| 1 | [erkamyaman/rust-anything](https://github.com/erkamyaman/rust-anything) | +8,103 | - | MIT | 앱을 조각조각 Rust로 옮기고, 원본과 똑같이 동작하는지 기록으로 검증하는 도구 | Rust 코드는 내 코딩 에이전트(Claude Code 등)가 써요. PHP·C#은 함수 단위 포팅만 돼요 (README) |
-| 2 | [bookwjitchieni1986/blender-ai-mcp-addon](https://github.com/bookwjitchieni1986/blender-ai-mcp-addon) | +2,753 | - | MIT | 블렌더 안에서 AI와 대화하며 장면을 만드는 애드온 겸 MCP 서버 | Windows x64·Blender 4.2 이상 전용 ZIP 배포예요 (README). 계정 이름이 무작위이고 설명이 키워드 나열이라, 설치 전에 릴리스 파일과 코드를 꼭 확인하세요 |
-| 3 | [iamajmeena/neonclipping](https://github.com/iamajmeena/neonclipping) | +2,122 | - | MIT | 긴 영상 링크를 넣으면 자막 달린 세로 쇼츠 클립을 만들어 주는 로컬 도구 | Python 3.10~3.13과 FFmpeg가 필요하고, 하이라이트 고르기에 로컬 LLM(Ollama)을 써요 (README) |
-| 4 | [EL4CTEO/fast-anything](https://github.com/EL4CTEO/fast-anything) | +2,095 | - | MIT | 느린 함수 5%만 찾아 Rust로 바꾸고 결과가 같은지 검증하는 성능 도구 | Rust 툴체인(rustup)이 필요하고, 포팅은 코딩 에이전트에게 맡기는 방식이에요 (README) |
-| 5 | [sybil-solutions/inference-optimisation-skill](https://github.com/sybil-solutions/inference-optimisation-skill) | +1,974 | - | MIT | 로컬 LLM 서버 속도를 단계별로 끌어올리는 에이전트 스킬(작업 지침서) | 실행 프로그램이 아니라 SKILL.md 지침이에요. 직접 GPU 서버를 돌리는 사람에게만 쓸모 있어요 (README) |
-| 6 | [INK-Q/agy-fast](https://github.com/INK-Q/agy-fast) | +592 | - | MIT | 구글 Antigravity 에이전트의 대기 시간과 토큰 사용량을 줄이는 MCP 플러그인 | Google Antigravity 전용이고 Node.js 20 이상이 필요해요. 설치는 원격 스크립트를 바로 실행하는 방식이라 내용을 먼저 보세요 (README) |
+| 1 | [erkamyaman/rust-anything](https://github.com/erkamyaman/rust-anything) | +8,150 | 새로 진입 | MIT | Rewrite your whole app in Rust, one piece at a time, checked against the original's recorded behavior at every step. CLIs, HTTP servers and libraries in TypeScript, Python, C, Go, Ruby and Java. | - |
+| 2 | [bookwjitchieni1986/blender-ai-mcp-addon](https://github.com/bookwjitchieni1986/blender-ai-mcp-addon) | +2,756 | 새로 진입 | MIT | AI assistant and MCP server for Blender: visual chat, scene tools, multi-agent workflows. Works with ChatGPT/GPT, Claude, Gemini, Ollama, OpenCode. Blender AI addon, copilot for 3D, bpy Python scripting, MCP integration. | - |
+| 3 | [EL4CTEO/fast-anything](https://github.com/EL4CTEO/fast-anything) | +2,204 | 새로 진입 | MIT | Don't rewrite it in Rust. Rewrite the 5% that's slow: profile Python, Node or Ruby apps, port the hot functions with your coding agent, prove they behave the same. | - |
+| 4 | [iamajmeena/neonclipping](https://github.com/iamajmeena/neonclipping) | +2,143 | 새로 진입 | MIT | Paste a link, get captioned 9:16 clips in ~2 min. Free, local, open-source clipping engine (audio-first, YouTube captions, local LLM). | - |
+| 5 | [sybil-solutions/inference-optimisation-skill](https://github.com/sybil-solutions/inference-optimisation-skill) | +1,980 | 새로 진입 | MIT | Agent skill for hill-climbing local LLM serving speed (decode, speculative decoding, prefill, KV, startup, TTFT) on any hardware and quantization | - |
+| 6 | [INK-Q/agy-fast](https://github.com/INK-Q/agy-fast) | +611 | 새로 진입 | MIT | Non-invasive MCP accelerator plugin for Google Antigravity (CLI/Desktop/IDE): cuts LLM turns (-34%), token quota (-31%), and upload traffic (-40%) without affecting native UI or diffs. | - |
+| 7 | [morluto/rea](https://github.com/morluto/rea) | +158 | 지난주 1위 ▼6 | MIT | Reverse engineer anything with agents, from app behavior down to native binaries. | - |
+| 8 | [elementalsouls/Claude-BugHunter](https://github.com/elementalsouls/Claude-BugHunter) | +134 | 새로 진입 | MIT | A Claude Code skill bundle for bug hunting and external red-team work - 82 skills, 15 slash commands, 681 disclosed-report patterns curated across 24 core vulnerability classes, plus enterprise identity + infrastructure attack matrices. | - |
+| 9 | [BaaRai/ARTEX](https://github.com/BaaRai/ARTEX) | +133 | 새로 진입 | AGPL-3.0 | ARTEX - AI autonomous penetration testing system (English translation; upstream: Autumn-27/ARTEX, AGPL-3.0) | - |
+| 10 | [pingdotgg/t3code](https://github.com/pingdotgg/t3code) | +123 | 지난주 3위 ▼7 | MIT | The best way to control Claude Code, Codex and more from any computer or phone | - |
 
-## 바로 써 보기 (설치 한 줄)
+## 빠진 곳
 
-**1위 erkamyaman/rust-anything**
-
-```bash
-cargo install rust-anything
-```
-
-**4위 EL4CTEO/fast-anything**
-
-```bash
-npm i -g @el4cteo/fast-anything
-```
-
-**5위 sybil-solutions/inference-optimisation-skill**
-
-```bash
-git clone https://github.com/sybil-solutions/inference-optimisation-skill
-```
-
-**6위 INK-Q/agy-fast**
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/INK-Q/agy-fast/main/install.sh | sh
-```
-
+- [Ebony-Vinyl/dsh-our-free-model](https://github.com/Ebony-Vinyl/dsh-our-free-model) · 지난주 2위 (이번 주 +114)
+- [janestreet/agent_skills](https://github.com/janestreet/agent_skills) · 지난주 4위 (이번 주 +14)
+- [ccch1mneyyy/dsh-Go](https://github.com/ccch1mneyyy/dsh-Go) · 지난주 5위 (이번 주 +64)
+- [yetone/magpie](https://github.com/yetone/magpie) · 지난주 6위 (이번 주 +39)
+- [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) · 지난주 7위 (이번 주 +47)
+- [vercel-labs/ui](https://github.com/vercel-labs/ui) · 지난주 8위 (이번 주 +21)
+- [stablyai/orca](https://github.com/stablyai/orca) · 지난주 9위 (이번 주 +103)
+- [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) · 지난주 10위 (이번 주 +60)
 
 ## 출처
 
 - GitHub REST API: 검색(`/search/repositories`), 저장소 정보(`/repos`), 별 기록(`/repos/{owner}/{repo}/stargazers`)
-- 후보 6개 중 별 증가 순. 필터: 포크 5개 이상, AI 관련 키워드
+- 후보 710개 중 별 증가 순. 필터: 포크 5개 이상, AI 관련 키워드
