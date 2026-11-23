@@ -439,27 +439,65 @@ def previous_report(today: str, min_gap_days: int = 4) -> dict | None:
     return _read_json(prev[-1], None) if prev else None
 
 
-def rank(cfg, rows: list[dict], today: str) -> tuple[list[dict], list[dict], dict | None]:
+def scope_reason(cfg, r: dict) -> str | None:
+    """Why a repo is outside the ranking scope (AI/LLM and developer tools), or None if it is in scope.
+    Rules live in [github_rising.scope] in config.toml; the weekly Claude task can exclude more by README."""
+    sc = cfg["github_rising"].get("scope", {})
+    if sc.get("enabled", True) is False:
+        return None
+    name = r["name"].lower()
+    if name in {x.lower() for x in sc.get("include", [])}:
+        return None
+    topics = {t.lower() for t in (r.get("topics") or [])}
+    name_words = set(re.split(r"[^a-z0-9]+", name.split("/")[-1])) | {name.split("/")[-1]}
+    desc = (r.get("description") or "").lower()
+    low = lambda xs: {x.lower() for x in xs}
+    for rule in sc.get("rules", []):
+        if topics & low(rule.get("unless_topics", [])):
+            continue
+        if (name_words & low(rule.get("name_words", [])) or topics & low(rule.get("topics", []))
+                or any(ph.lower() in desc for ph in rule.get("phrases", []))):
+            return rule["reason"]
+    return None
+
+
+def change_label(prev: dict | None, p: int | None, i: int) -> str:
+    if not prev:
+        return "-"
+    if p is None:
+        return "새로 진입"
+    if p == i:
+        return f"지난주 {p}위 ="
+    if p > i:
+        return f"지난주 {p}위 ▲{p - i}"
+    return f"지난주 {p}위 ▼{i - p}"
+
+
+def rank(cfg, rows: list[dict], today: str):
+    """Returns (top, dropped, prev, excluded, reserve).
+    top: in-scope repos ordered by 7-day star gain. excluded: out-of-scope repos that would have
+    made the list, with a reason. reserve: the next in-scope repos, used if the weekly task excludes one."""
     top_n = cfg["github_rising"]["report"]["top_n"]
+    reserve_n = cfg["github_rising"].get("scope", {}).get("reserve", 10)
     ordered = sorted(rows, key=lambda r: (r["gain"], r["stargazers_count"]), reverse=True)
-    top = [dict(r) for r in ordered[:top_n]]
+    top, excluded, reserve = [], [], []
+    for r in ordered:
+        if len(top) >= top_n and len(reserve) >= reserve_n:
+            break
+        why = scope_reason(cfg, r)
+        if why:
+            if len(top) < top_n:
+                excluded.append({"name": r["name"], "html_url": r["html_url"], "gain": r["gain"],
+                                 "estimated": r.get("estimated"), "reason": why})
+            continue
+        (top if len(top) < top_n else reserve).append(dict(r))
     prev = previous_report(today)
     prev_rank = {it["name"]: it["rank"] for it in (prev or {}).get("items", [])}
     ratio = cfg["github_rising"]["filter"].get("suspicious_fork_ratio", 0.01)
-    for i, r in enumerate(top, 1):
+    for i, r in enumerate(top + reserve, 1):
         r["rank"] = i
-        p = prev_rank.get(r["name"])
-        r["prev_rank"] = p
-        if not prev:
-            r["change"] = "-"
-        elif p is None:
-            r["change"] = "새로 진입"
-        elif p == i:
-            r["change"] = f"지난주 {p}위 ="
-        elif p > i:
-            r["change"] = f"지난주 {p}위 ▲{p - i}"
-        else:
-            r["change"] = f"지난주 {p}위 ▼{i - p}"
+        r["prev_rank"] = prev_rank.get(r["name"])
+        r["change"] = change_label(prev, r["prev_rank"], i)
         stars = r["stargazers_count"] or 1
         r["suspicious"] = (r.get("forks_count") or 0) / stars < ratio and stars > 1000
     current = {r["name"] for r in top}
@@ -470,7 +508,34 @@ def rank(cfg, rows: list[dict], today: str) -> tuple[list[dict], list[dict], dic
             now = gains.get(it["name"])
             dropped.append({"name": it["name"], "html_url": it["html_url"], "prev_rank": it["rank"],
                             "gain": now["gain"] if now else None})
-    return top, dropped, prev
+    return top, dropped, prev, excluded, reserve
+
+
+def apply_exclusions(report: dict, exclude: dict[str, str]) -> int:
+    """Drop items the weekly task judged out of scope (name -> reason) and refill from the reserve."""
+    if not exclude:
+        return 0
+    pool = report["items"] + report.get("reserve", [])
+    keep = [it for it in pool if it["name"] not in exclude]
+    n = len(report["items"])
+    for it in pool:
+        if it["name"] in exclude and it in report["items"]:
+            report.setdefault("excluded", []).append(
+                {"name": it["name"], "html_url": it["html_url"], "gain": it["gain"],
+                 "estimated": it.get("estimated"), "reason": exclude[it["name"]]})
+    prev = previous_report(report["date"])
+    for i, it in enumerate(keep, 1):
+        it["rank"] = i
+        it["change"] = change_label(prev, it.get("prev_rank"), i)
+    removed = n - len([it for it in report["items"] if it["name"] not in exclude])
+    report["items"], report["reserve"] = keep[:n], keep[n:]
+    current = {it["name"] for it in report["items"]}
+    report["dropped"] = [d for d in report.get("dropped", []) if d["name"] not in current]
+    for it in (prev or {}).get("items", []):
+        if it["name"] not in current and it["name"] not in {d["name"] for d in report["dropped"]}:
+            report["dropped"].append({"name": it["name"], "html_url": it["html_url"],
+                                      "prev_rank": it["rank"], "gain": None})
+    return removed
 
 
 def save_report(report: dict) -> Path:

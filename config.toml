@@ -75,6 +75,39 @@ exclude = [                 # 영구 제외할 저장소 (owner/name)
 # 별 대비 포크 비율이 이보다 낮으면 "가짜 스타 의심" 경고를 달아요 (제외는 안 해요).
 suspicious_fork_ratio = 0.01
 
+[github_rising.scope]
+# 순위(Top 10)에 올리는 범위: AI/LLM과 개발 도구만. 수집은 넓게 하고, 순위 단계에서만 걸러요.
+# 걸린 저장소는 리포트 아래 "제외한 곳"에 이유와 함께 남아요.
+# 이름(owner/ 뒤)을 단어로 나눈 것과 토픽은 words로, 설명은 phrases로 비교해요.
+# 규칙으로 못 거른 것은 매주 Claude 예약 작업이 README를 읽고 "exclude"로 빼요 (docs/claude-weekly-task.md).
+enabled = true
+reserve = 10      # Top 10 다음 순위 저장소를 이만큼 예비로 저장해 두고, 빠진 자리를 채워요
+include = []      # 규칙에 걸려도 순위에 올릴 저장소 (owner/name)
+
+# name_words: 저장소 이름(owner/ 뒤)을 -·_ 로 나눈 단어, topics: GitHub 토픽, phrases: 설명에 들어간 문구.
+# unless_topics: 이 토픽이 있으면 이 규칙을 적용하지 않아요 (예: 블렌더용 MCP 서버는 "MCP 서버"라서 순위에 올려요).
+
+[[github_rising.scope.rules]]
+reason = "창작·디자인 도구"
+name_words = ["blender", "photoshop", "illustrator", "premiere", "aftereffects"]
+topics = ["blender", "blender-addon", "photoshop", "illustrator", "after-effects", "3d-printing", "music-production"]
+phrases = ["blender add-on", "blender addon"]
+unless_topics = ["mcp", "mcp-server", "model-context-protocol", "agent-skills"]
+
+[[github_rising.scope.rules]]
+reason = "게임·일반 사용자용 앱"
+name_words = ["game", "games", "minecraft", "roblox", "anime", "manga", "wallpaper"]
+topics = ["game", "games", "minecraft", "roblox", "anime", "manga", "music-player", "video-player", "iptv"]
+phrases = []
+unless_topics = ["mcp", "mcp-server", "model-context-protocol"]
+
+[[github_rising.scope.rules]]
+reason = "강의·자료·링크 모음"
+name_words = ["awesome", "interview", "tutorial", "tutorials", "course", "courses", "roadmap", "cheatsheet",
+              "leetcode", "howto"]
+topics = ["awesome", "awesome-list", "awesome-lists", "course", "courses", "learning-resources", "roadmap", "cheatsheet"]
+phrases = ["curated list", "awesome list", "interview questions", "free courses", "collection of resources"]
+
 [github_rising.bootstrap]
 # 7일 전 스냅샷이 없을 때(첫 주, 지난 주 채우기)는 별 증가를 다른 곳에서 세요.
 # 1순위: 공개 GH Archive 데이터(ClickHouse, 토큰 불필요). 안 되면 2순위: stargazers API.

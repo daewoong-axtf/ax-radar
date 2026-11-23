@@ -87,6 +87,10 @@ def markdown(report: dict, cfg) -> str:
         for d in dropped:
             g = f" (이번 주 +{d['gain']:,})" if d.get("gain") is not None else ""
             lines.append(f"- [{d['name']}]({d['html_url']}) · 지난주 {d['prev_rank']}위{g}")
+    if report.get("excluded"):
+        lines += ["", "## 제외한 곳", "", "별은 많이 늘었지만 AI·개발 도구가 아니라서 순위에서 뺐어요.", ""]
+        for x in report["excluded"]:
+            lines.append(f"- [{x['name']}]({x['html_url']}) · {fmt_gain(x)} · {x['reason']}")
     lines += ["", "## 출처", "",
               "- GitHub REST API: 검색(`/search/repositories`), 저장소 정보(`/repos`), "
               "별 기록(`/repos/{owner}/{repo}/stargazers`)",
@@ -235,6 +239,11 @@ def report_html(report: dict, cfg) -> str:
         for d in dropped:
             g = f" (이번 주 +{d['gain']:,})" if d.get("gain") is not None else ""
             body.append(f'<li><a href="{e(d["html_url"])}">{e(d["name"])}</a> · 지난주 {d["prev_rank"]}위{g}</li>')
+        body.append("</ul>")
+    if report.get("excluded"):
+        body.append('<h2>제외한 곳</h2><p class="meta">별은 많이 늘었지만 AI·개발 도구가 아니라서 순위에서 뺐어요.</p><ul class="plain">')
+        for x in report["excluded"]:
+            body.append(f'<li><a href="{e(x["html_url"])}">{e(x["name"])}</a> · {fmt_gain(x)} · {e(x["reason"])}</li>')
         body.append("</ul>")
     f = cfg["github_rising"]["filter"]
     body.append('<h2>출처</h2><ul class="plain">'

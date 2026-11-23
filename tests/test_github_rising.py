@@ -95,7 +95,7 @@ class Tests(unittest.TestCase):
         gains = {r["name"]: (r["gain"], r["method"]) for r in rows}
         self.assertEqual(gains, {"a/agent-one": (900, "snapshot"), "a/agent-two": (300, "snapshot"),
                                  "a/new-llm": (5000, "new")})
-        top, dropped, _ = core.rank(CFG, rows, today)
+        top, dropped, _, _, _ = core.rank(CFG, rows, today)
         self.assertEqual([(t["name"], t["change"]) for t in top],
                          [("a/new-llm", "새로 진입"), ("a/agent-one", "새로 진입"), ("a/agent-two", "지난주 1위 ▼2")])
         self.assertEqual([d["name"] for d in dropped], ["a/gone-llm"])
@@ -121,6 +121,30 @@ class TrendingParseTest(unittest.TestCase):
 <article class="Box-row"><h2 class="h3"><a href="/meta/astryx">dup</a></h2></article>
 """
         self.assertEqual(parse_trending(page), ["meta/astryx", "GoogleChrome/modern-web-guidance"])
+
+
+class ScopeTest(unittest.TestCase):
+    def test_scope_rules_and_exclusions(self):
+        import copy, tomllib
+        from pathlib import Path
+        from radar.sources.github_rising import core
+        cfg = tomllib.loads((Path(__file__).resolve().parent.parent / "config.toml").read_text("utf-8"))
+        cfg["github_rising"]["report"]["top_n"] = 2
+        cfg["github_rising"]["scope"]["reserve"] = 2
+        mk = lambda n, g, **kw: {"name": n, "html_url": "https://github.com/" + n, "gain": g,
+                                 "stargazers_count": g, "forks_count": g, **kw}
+        rows = [mk("a/blender-ai-addon", 900, topics=["blender"]),
+                mk("b/agent", 800), mk("c/awesome-claude", 700, description="A curated list of Claude tools"),
+                mk("d/tool", 600), mk("e/cli", 500), mk("f/x", 400)]
+        top, _, _, excluded, reserve = core.rank(cfg, rows, "2000-01-03")
+        self.assertEqual([r["name"] for r in top], ["b/agent", "d/tool"])
+        self.assertEqual([(x["name"], x["reason"]) for x in excluded],
+                         [("a/blender-ai-addon", "창작·디자인 도구"), ("c/awesome-claude", "강의·자료·링크 모음")])
+        self.assertEqual([r["name"] for r in reserve], ["e/cli", "f/x"])
+        rep = {"date": "2000-01-03", "items": top, "reserve": reserve, "dropped": [], "excluded": excluded}
+        core.apply_exclusions(rep, {"d/tool": "일반 사용자용 앱"})
+        self.assertEqual([(r["rank"], r["name"]) for r in rep["items"]], [(1, "b/agent"), (2, "e/cli")])
+        self.assertEqual(rep["excluded"][-1]["name"], "d/tool")
 
 if __name__ == "__main__":
     unittest.main()

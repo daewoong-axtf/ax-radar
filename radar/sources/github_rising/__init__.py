@@ -69,10 +69,13 @@ def run(command: str, cfg: dict, gh, args, log=print) -> dict | None:
         return None
     if command == "pending":
         rep = _latest()
-        todo = [{"name": it["name"], "rank": it["rank"], "description": it.get("description"),
+        # Top 10 plus the reserve: the task summarizes all of them and may exclude off-topic ones,
+        # in which case enrich promotes the next reserve repo.
+        todo = [{"name": it["name"], "rank": it["rank"], "reserve": it in (rep or {}).get("reserve", []),
+                 "gain": it.get("gain"), "description": it.get("description"),
                  "topics": it.get("topics"), "license": it.get("license"), "language": it.get("language"),
                  "readme_url": f"https://raw.githubusercontent.com/{it['name']}/HEAD/README.md"}
-                for it in (rep or {}).get("items", []) if not it.get("one_liner")]
+                for it in (rep or {}).get("items", []) + (rep or {}).get("reserve", []) if not it.get("one_liner")]
         print(json.dumps({"date": rep and rep["date"], "enriched": bool(rep and rep.get("enriched")),
                           "notified": bool(rep and rep.get("notified")), "items": todo}, ensure_ascii=False, indent=1))
         return None
@@ -88,11 +91,17 @@ def run(command: str, cfg: dict, gh, args, log=print) -> dict | None:
             data = {d["name"]: d for d in data}
         for rep in reps:
             n = 0
-            for it in rep["items"]:
+            for it in rep["items"] + rep.get("reserve", []):
                 s = data.get(it["name"])
                 if s:
                     it.update({k: (s.get(k) or "").strip() for k in SUMMARY_FIELDS if k in s})
-                    n += 1
+                    n += it in rep["items"]
+            if rep is reps[-1] and not rep.get("notified"):
+                # "exclude": "<이유>" from the weekly task = outside AI/LLM and developer tools
+                out = {k: v["exclude"].strip() for k, v in data.items() if (v.get("exclude") or "").strip()}
+                gone = core.apply_exclusions(rep, out)
+                if gone:
+                    log(f"excluded {gone} off-topic repos in {rep['date']}, refilled from the reserve")
             if n or rep is reps[-1]:
                 rep["enriched"] = True
                 core.save_report(rep)
@@ -121,11 +130,12 @@ def run(command: str, cfg: dict, gh, args, log=print) -> dict | None:
             return None
         cur = core.load_snapshot(snaps[-1])
         rows, meta = core.compute_gains(cfg, gh, cur, as_of, log, until=until)
-        top, dropped, prev = core.rank(cfg, rows, as_of)
+        top, dropped, prev, excluded, reserve = core.rank(cfg, rows, as_of)
         _carry_summaries(top)
         report = {"date": as_of, "meta": meta,
                   "items": [{k: it.get(k) for k in ITEM_FIELDS} for it in top],
                   "dropped": dropped, "previous": prev["date"] if prev else None,
+                  "excluded": excluded, "reserve": [{k: it.get(k) for k in ITEM_FIELDS} for it in reserve],
                   "enriched": False, "notified": True}
         if args.dry_run:
             log(render.markdown(report, cfg))
@@ -145,7 +155,7 @@ def run(command: str, cfg: dict, gh, args, log=print) -> dict | None:
         cur = core.load_snapshot(snaps[-1])
         log(f"using today's snapshot ({len(cur['repos'])} repos)")
     rows, meta = core.compute_gains(cfg, gh, cur, today, log)
-    top, dropped, prev = core.rank(cfg, rows, today)
+    top, dropped, prev, excluded, reserve = core.rank(cfg, rows, today)
     carried = _carry_summaries(top)
     if carried:
         log(f"  reused Korean summaries for {carried} repos from earlier reports")
@@ -155,6 +165,7 @@ def run(command: str, cfg: dict, gh, args, log=print) -> dict | None:
     report = {"date": today, "meta": meta,
               "items": [{k: it.get(k) for k in ITEM_FIELDS} for it in top],
               "dropped": dropped, "previous": prev["date"] if prev else None,
+              "excluded": excluded, "reserve": [{k: it.get(k) for k in ITEM_FIELDS} for it in reserve],
               "enriched": mode == "api", "notified": mode != "claude-task"}
     if args.dry_run:
         log(render.markdown(report, cfg))

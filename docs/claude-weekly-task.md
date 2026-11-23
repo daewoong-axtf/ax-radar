@@ -16,6 +16,10 @@ API 키 없이 Claude 예약 작업이 GitHub 급상승 BEST 10에 한국어 요
      "category": "에이전트 | 코딩 도구 | MCP | 모델 | RAG·데이터 | 인프라 | 기타"}]
    ```
    별을 사서 올린 것처럼 보이는 저장소(내용 없는 README, 키워드 나열)는 caveat에 그렇게 적어요.
+   `pending`에는 Top 10과 예비 순위(`"reserve": true`)가 함께 나와요. 모두 요약해요.
+   **순위 범위 확인**: README를 읽고 AI/LLM이나 개발 도구가 아니면 그 항목에 `"exclude": "<이유>"`를 넣어요.
+   이유는 `창작·디자인 도구`, `게임·일반 사용자용 앱`, `강의·자료·링크 모음`, `주제와 무관한 화제성 저장소` 중 하나예요.
+   그러면 `enrich`가 그 항목을 "제외한 곳"으로 옮기고 예비 순위에서 다음 저장소를 올려요. 애매하면 빼지 않아요.
 4. `python -m radar github_rising enrich --file summaries.json` 후 `data/github_rising/reports/`와
    `reports/`를 커밋해서 main에 push해요. push가 되면 Actions가 페이지·RSS·Slack을 보내요.
 
