@@ -263,6 +263,14 @@ def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print,
         rows.append(row)
 
     bcfg = cfg["github_rising"]["bootstrap"]
+    if need_boot and bcfg.get("enabled", True) and bcfg.get("gharchive", True):
+        counts = gharchive_star_counts([r["name"] for r in need_boot], since, end, log)
+        if counts is not None:
+            for row in need_boot:
+                row["gain"], row["method"] = counts.get(row["name"], 0), "gharchive"
+                rows.append(row)
+            need_boot = []
+            meta["source"] = "gharchive"
     if need_boot and bcfg.get("enabled", True):
         def velocity(row):
             age = max(1.0, (datetime.now(timezone.utc) -
@@ -301,6 +309,49 @@ def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print,
             meta["bootstrap_failed"] = True
     meta["candidates"] = len(rows)
     return rows, meta
+
+
+# ---------------------------------------------------------------- GH Archive (public ClickHouse)
+
+CLICKHOUSE_URL = "https://play.clickhouse.com/?user=play"
+
+
+def gharchive_star_counts(names: list[str], since: datetime, until: datetime, log=print) -> dict[str, int] | None:
+    """Stars (WatchEvent) per repo in [since, until) from the public GH Archive dataset.
+    One query for every repo, no GitHub token needed. Returns None if the service is unreachable."""
+    import urllib.request
+
+    def lit(x: str) -> str:
+        return "'" + x.replace("\\", "\\\\").replace("'", "\\'") + "'"
+
+    fmt = lambda d: d.astimezone(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")
+    sql = ("SELECT repo_name, count() AS n FROM github_events WHERE event_type = 'WatchEvent' "
+           f"AND created_at >= '{fmt(since)}' AND created_at < '{fmt(until)}' "
+           f"AND repo_name IN ({', '.join(lit(n) for n in names)}) GROUP BY repo_name FORMAT JSON")
+    fresh_sql = "SELECT max(created_at) AS t FROM github_events WHERE event_type = 'WatchEvent' FORMAT JSON"
+    try:
+        def q(text):
+            req = urllib.request.Request(CLICKHOUSE_URL, data=text.encode(), method="POST",
+                                         headers={"User-Agent": "ai-dev-radar"})
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                return json.loads(resp.read())["data"]
+        latest = q(fresh_sql)[0]["t"]
+        latest_dt = datetime.fromisoformat(latest.replace(" ", "T")).replace(tzinfo=timezone.utc)
+        if latest_dt < until - timedelta(hours=12):
+            log(f"  gharchive: data only up to {latest} UTC, too old for this window")
+            return None
+        rows = q(sql)
+    except Exception as e:  # noqa: BLE001 - optional source
+        log(f"  gharchive: unavailable ({e})")
+        return None
+    counts = {n: 0 for n in names}
+    lower = {n.lower(): n for n in names}
+    for r in rows:
+        name = lower.get(r["repo_name"].lower())
+        if name:
+            counts[name] = int(r["n"])
+    log(f"  gharchive: counted stars for {len(names)} repos (data up to {latest} UTC)")
+    return counts
 
 
 # ---------------------------------------------------------------- ranking

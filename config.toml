@@ -44,8 +44,10 @@ exclude = [                 # 영구 제외할 저장소 (owner/name)
 suspicious_fork_ratio = 0.01
 
 [github_rising.bootstrap]
-# 7일 전 스냅샷이 없을 때(첫 주) stargazers API의 starred_at으로 직접 세요.
+# 7일 전 스냅샷이 없을 때(첫 주, 지난 주 채우기)는 별 증가를 다른 곳에서 세요.
+# 1순위: 공개 GH Archive 데이터(ClickHouse, 토큰 불필요). 안 되면 2순위: stargazers API.
 enabled = true
+gharchive = true
 max_pages_per_repo = 40    # 1페이지=100개. 4,000개 넘게 오른 레포는 "4,000+"로 표시돼요
 max_repos = 250            # 비용 제한: 하루 평균 별 증가가 큰 순으로 이 개수까지만 세요
 
