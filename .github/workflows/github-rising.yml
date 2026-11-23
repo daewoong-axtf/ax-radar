@@ -20,7 +20,7 @@ on:
         description: "실행할 명령"
         default: report
         type: choice
-        options: [report, snapshot, publish, site]
+        options: [report, snapshot, publish, resend, site]
       notify:
         description: "Slack/Discord/웹훅으로 보내기"
         default: true

@@ -6,6 +6,7 @@
   pending   최신 리포트에서 요약이 비어 있는 항목과 README 주소를 JSON으로 출력 (Claude 예약 작업용)
   enrich    --file summaries.json 의 요약을 최신 리포트에 합치고 페이지/RSS 다시 만들기
   publish   페이지/RSS 다시 만들고, 아직 안 보낸 최신 리포트를 알림으로 보내기 (한 번만)
+  resend    최신 리포트 알림을 다시 보내기 (테스트용)
   site      저장된 리포트로 페이지/RSS만 다시 만들기
 """
 from __future__ import annotations
@@ -20,7 +21,7 @@ ITEM_FIELDS = ("rank", "name", "html_url", "gain", "capped", "method", "stargaze
                "one_liner", "caveat", "install", "category")
 SUMMARY_FIELDS = ("one_liner", "caveat", "install", "category")
 
-COMMANDS = ("snapshot", "report", "pending", "enrich", "publish", "site")
+COMMANDS = ("snapshot", "report", "pending", "enrich", "publish", "resend", "site")
 site_section = render.site_section
 
 
@@ -81,10 +82,10 @@ def run(command: str, cfg: dict, gh, args, log=print) -> dict | None:
         _rebuild(cfg)
         log(f"enriched {n}/{len(rep['items'])} items in {rep['date']}")
         return None
-    if command == "publish":
+    if command in ("publish", "resend"):
         _rebuild(cfg)
         rep = _latest()
-        if not rep or rep.get("notified"):
+        if not rep or (rep.get("notified") and command == "publish"):
             log("nothing new to notify")
             return None
         rep["notified"] = True
