@@ -145,8 +145,9 @@ def eligible(name: str, r: dict, cfg) -> bool:
 
 STARS_QUERY = """query($owner:String!,$name:String!,$before:String){
   repository(owner:$owner,name:$name){
+    stargazerCount
     stargazers(last:100,before:$before,orderBy:{field:STARRED_AT,direction:ASC}){
-      edges{starredAt} pageInfo{startCursor hasPreviousPage}}}}"""
+      totalCount edges{starredAt} pageInfo{startCursor hasPreviousPage}}}}"""
 
 
 def _count_graphql(gh: GitHub, name: str, since: datetime, max_pages: int, until: datetime | None = None):
@@ -155,9 +156,18 @@ def _count_graphql(gh: GitHub, name: str, since: datetime, max_pages: int, until
     count, before, prev_ts = 0, None, None
     for _ in range(max_pages):
         data = gh.graphql(STARS_QUERY, {"owner": owner, "name": repo, "before": before})
-        conn = ((data or {}).get("repository") or {}).get("stargazers")
+        repo_data = (data or {}).get("repository") or {}
+        conn = repo_data.get("stargazers")
         if conn is None:
             return None
+        if before is None and not conn["edges"] and repo_data.get("stargazerCount"):
+            raise GitHubError(0, f"graphql returned no stargazers for {name} "
+                                 f"(stargazerCount={repo_data.get('stargazerCount')}, totalCount={conn.get('totalCount')})")
+        if before is None and conn["edges"]:
+            first = conn["edges"][-1]["starredAt"]
+            if not getattr(gh, "_logged_sample", False):
+                gh._logged_sample = True
+                print(f"    sample {name}: newest starredAt={first}, page={len(conn['edges'])}, total={conn.get('totalCount')}")
         for edge in reversed(conn["edges"]):  # page is oldest->newest; walk newest first
             ts = datetime.fromisoformat(edge["starredAt"].replace("Z", "+00:00"))
             if prev_ts is not None and ts > prev_ts + timedelta(seconds=1):
