@@ -83,6 +83,8 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
           GENERIC_WEBHOOK_URL: ${{ secrets.GENERIC_WEBHOOK_URL }}
+          # 슬랙의 "전체 리포트 보기" 링크 (비우면 github.io 리포트 페이지)
+          REPORT_LINK_URL: ${{ secrets.REPORT_LINK_URL }}
         run: python -m radar github_rising ${{ steps.pick.outputs.cmd }} ${{ steps.pick.outputs.flags }}
       - name: Commit data
         run: |

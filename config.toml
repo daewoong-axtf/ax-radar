@@ -136,3 +136,5 @@ generic_webhook = true
 [site]
 # GitHub Pages 주소. 알림·RSS 안의 링크에 써요. (Settings → Pages → Source: GitHub Actions)
 base_url = "https://daewoong-axtf.github.io/ax-radar"
+# 슬랙 "전체 리포트 보기" 링크. 저장소 비밀값 REPORT_LINK_URL이 있으면 그걸 먼저 써요. 비우면 github.io 리포트 페이지예요.
+report_link = "https://app.notion.com/p/GitHub-AI-4213d273ae9b80a0a706d15aa7de1641"

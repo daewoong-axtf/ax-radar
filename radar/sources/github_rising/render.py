@@ -5,6 +5,7 @@ import re
 
 import html
 import json
+import os
 from datetime import datetime
 from pathlib import Path
 from xml.sax.saxutils import escape
@@ -16,6 +17,12 @@ PUBLIC = ROOT / "public" / "github-rising"
 
 def base_url(cfg) -> str:
     return (cfg.get("site", {}).get("base_url") or "").rstrip("/")
+
+
+def report_link(cfg) -> str:
+    """Where the "전체 리포트 보기" link in Slack points. REPORT_LINK_URL (repo secret) wins
+    over site.report_link; empty means the github.io report page."""
+    return (os.environ.get("REPORT_LINK_URL") or cfg.get("site", {}).get("report_link") or "").strip()
 
 
 ORD = ["첫째", "둘째", "셋째", "넷째", "다섯째"]
@@ -183,8 +190,16 @@ def slack_payload(report: dict, cfg) -> dict:
         names = ", ".join(f"<{d['html_url']}|{d['name']}> (지난주 {d['prev_rank']}위)" for d in report["dropped"])
         blocks += [{"type": "divider"}, {"type": "section", "text": {"type": "mrkdwn", "text": f"*빠진 곳*: {names}"[:2900]}}]
     site = base_url(cfg)
+    links = []
+    page = report_link(cfg)
+    if page:
+        links.append(f"<{page}|전체 리포트 보기>")
+    elif site:
+        links.append(f"<{site}/github-rising/{report['date']}/|웹에서 전체 리포트 보기>")
     if site:
-        blocks.append({"type": "context", "elements": [{"type": "mrkdwn", "text": f"<{site}/github-rising/{report['date']}/|웹에서 전체 리포트 보기> · <{site}/github-rising/feed.xml|RSS>"}]})
+        links.append(f"<{site}/github-rising/feed.xml|RSS>")
+    if links:
+        blocks.append({"type": "context", "elements": [{"type": "mrkdwn", "text": " · ".join(links)}]})
     return {"text": title_for(report, cfg), "blocks": blocks[:50]}
 
 
