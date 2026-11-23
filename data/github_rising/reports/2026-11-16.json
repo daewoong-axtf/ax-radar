@@ -1,0 +1,17 @@
+{
+ "date": "2026-11-16",
+ "dropped": [],
+ "enriched": false,
+ "items": [],
+ "meta": {
+  "backfill": true,
+  "base_snapshot": null,
+  "bootstrap_failed": true,
+  "candidates": 0,
+  "since": "2026-11-09T07:00:00+09:00",
+  "until": "2026-11-16T07:00:00+09:00",
+  "window_days": 7
+ },
+ "notified": true,
+ "previous": null
+}
