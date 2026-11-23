@@ -453,6 +453,6 @@
   "until": "2026-11-23T15:08:46+09:00",
   "window_days": 7
  },
- "notified": false,
+ "notified": true,
  "previous": "2026-11-16"
 }
