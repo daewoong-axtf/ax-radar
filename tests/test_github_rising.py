@@ -52,6 +52,23 @@ class Tests(unittest.TestCase):
         self.assertEqual(core.count_recent_stars(gh, "x/y", 1000, since, 1), (100, True))
         self.assertIsNone(core.count_recent_stars(gh, "x/y", 50000, since, 60))
 
+    def test_count_recent_stars_graphql(self):
+        rest = FakeGH(1000, 1)
+        newest_first = list(reversed(rest.times))
+
+        class GQL:
+            token = "x"
+
+            def graphql(self, q, v):
+                start = int(v["after"] or 0)
+                edges = [{"starredAt": t.strftime("%Y-%m-%dT%H:%M:%SZ")} for t in newest_first[start:start + 100]]
+                return {"repository": {"stargazers": {"edges": edges, "pageInfo": {
+                    "endCursor": str(start + 100), "hasNextPage": start + 100 < len(newest_first)}}}}
+
+        since = datetime.now(UTC) - timedelta(days=7)
+        self.assertEqual(core.count_recent_stars(GQL(), "x/y", 50000, since, 60), (168, False))
+        self.assertEqual(core.count_recent_stars(GQL(), "x/y", 50000, since, 1), (100, True))
+
     def test_keyword_filter(self):
         self.assertTrue(core.eligible("a/agentkit", repo(500), CFG))
         self.assertFalse(core.eligible("a/fonts", repo(500, desc="a nice font"), CFG))

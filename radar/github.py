@@ -59,6 +59,36 @@ class GitHub:
                 time.sleep(2 ** attempt)
         raise GitHubError(0, f"giving up on {url}")
 
+    def graphql(self, query: str, variables: dict) -> dict:
+        if not self.token:
+            raise GitHubError(401, "GraphQL needs a token")
+        body = json.dumps({"query": query, "variables": variables}).encode()
+        headers = {"Authorization": f"Bearer {self.token}", "Content-Type": "application/json",
+                   "User-Agent": "ai-dev-radar"}
+        for attempt in range(4):
+            req = urllib.request.Request(API + "/graphql", data=body, headers=headers, method="POST")
+            try:
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    self.calls += 1
+                    data = json.loads(resp.read())
+            except urllib.error.HTTPError as e:
+                self.calls += 1
+                if e.code >= 500 or e.code in (403, 429):
+                    time.sleep(5 * (attempt + 1))
+                    continue
+                raise GitHubError(e.code, e.read().decode("utf-8", "replace")[:300]) from None
+            except (urllib.error.URLError, TimeoutError):
+                time.sleep(2 ** attempt)
+                continue
+            if data.get("errors"):
+                msg = json.dumps(data["errors"])[:300]
+                if "RATE_LIMITED" in msg:
+                    time.sleep(60)
+                    continue
+                raise GitHubError(200, msg)
+            return data["data"]
+        raise GitHubError(0, "graphql: giving up")
+
     def get(self, path: str, params: dict | None = None, **kw):
         return self._request(path, params, **kw)[0]
 

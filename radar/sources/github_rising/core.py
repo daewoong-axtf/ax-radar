@@ -143,9 +143,33 @@ def eligible(name: str, r: dict, cfg) -> bool:
 
 # ---------------------------------------------------------------- star gains
 
-def count_recent_stars(gh: GitHub, name: str, stars: int, since: datetime, max_pages: int):
-    """Count stargazers with starred_at >= since by walking pages backwards.
-    Returns (count, capped) or None when the repo is too big for the API (>40k stars)."""
+STARS_QUERY = """query($owner:String!,$name:String!,$after:String){
+  repository(owner:$owner,name:$name){
+    stargazers(first:100,after:$after,orderBy:{field:STARRED_AT,direction:DESC}){
+      edges{starredAt} pageInfo{endCursor hasNextPage}}}}"""
+
+
+def _count_graphql(gh: GitHub, name: str, since: datetime, max_pages: int):
+    """Newest-first via GraphQL: no 40k limit, stops at the first star older than `since`."""
+    owner, repo = name.split("/", 1)
+    count, after = 0, None
+    for _ in range(max_pages):
+        data = gh.graphql(STARS_QUERY, {"owner": owner, "name": repo, "after": after})
+        conn = ((data or {}).get("repository") or {}).get("stargazers")
+        if conn is None:
+            return None
+        for edge in conn["edges"]:
+            if datetime.fromisoformat(edge["starredAt"].replace("Z", "+00:00")) < since:
+                return count, False
+            count += 1
+        if not conn["pageInfo"]["hasNextPage"]:
+            return count, False
+        after = conn["pageInfo"]["endCursor"]
+    return count, True
+
+
+def _count_rest(gh: GitHub, name: str, stars: int, since: datetime, max_pages: int):
+    """Oldest-first REST list walked backwards from the last page (only up to 40k stars)."""
     last = max(1, math.ceil(stars / 100))
     if last > 400:
         return None
@@ -153,10 +177,7 @@ def count_recent_stars(gh: GitHub, name: str, stars: int, since: datetime, max_p
     for i, page in enumerate(range(last, 0, -1)):
         if i >= max_pages:
             return count, True
-        try:
-            rows = gh.stargazer_page(name, page)
-        except GitHubError:
-            return None
+        rows = gh.stargazer_page(name, page)
         if not rows and page == last and last > 1:
             continue  # count was slightly stale; last page empty
         older = False
@@ -169,6 +190,24 @@ def count_recent_stars(gh: GitHub, name: str, stars: int, since: datetime, max_p
         if older:
             return count, False
     return count, False
+
+
+def count_recent_stars(gh: GitHub, name: str, stars: int, since: datetime, max_pages: int, errors: list | None = None):
+    """Count stars given since `since`. Returns (count, capped) or None if it could not be counted."""
+    for method in ("graphql", "rest"):
+        if method == "graphql" and not getattr(gh, "token", None):
+            continue
+        try:
+            if method == "graphql":
+                res = _count_graphql(gh, name, since, max_pages)
+            else:
+                res = _count_rest(gh, name, stars, since, max_pages)
+            if res is not None:
+                return res
+        except GitHubError as e:
+            if errors is not None:
+                errors.append(f"{method} {name}: {e}")
+    return None
 
 
 def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print) -> tuple[list[dict], dict]:
@@ -207,8 +246,11 @@ def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print) -> tuple[li
         todo = need_boot[: bcfg.get("max_repos", 250)]
         log(f"  counting recent stargazers for {len(todo)} repos (no base snapshot)")
 
+        errors: list[str] = []
+
         def work(row):
-            res = count_recent_stars(gh, row["name"], row["stargazers_count"], since, bcfg.get("max_pages_per_repo", 60))
+            res = count_recent_stars(gh, row["name"], row["stargazers_count"], since,
+                                     bcfg.get("max_pages_per_repo", 60), errors)
             return row, res
 
         with ThreadPoolExecutor(8) as ex:
@@ -218,6 +260,10 @@ def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print) -> tuple[li
                 row["gain"], row["capped"] = res
                 row["method"] = "stargazers"
                 rows.append(row)
+        counted = sum(1 for r in rows if r.get("method") == "stargazers")
+        log(f"  counted {counted}/{len(todo)} repos; {len(errors)} errors")
+        for err in errors[:5]:
+            log(f"    {err}")
     meta["candidates"] = len(rows)
     return rows, meta
 
