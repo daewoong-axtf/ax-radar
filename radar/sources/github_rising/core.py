@@ -76,11 +76,13 @@ def fetch_trending(cfg, log=print) -> list[str]:
             req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (ax-radar)", "Accept": "text/html"})
             try:
                 with urllib.request.urlopen(req, timeout=30) as resp:
-                    found = parse_trending(resp.read().decode("utf-8", "replace"))
+                    page = resp.read().decode("utf-8", "replace")
+                    found = parse_trending(page)
             except Exception as e:  # trending is a bonus source; never fail the snapshot over it
                 log(f"  trending {lang or 'all'}/{period} failed: {e}")
                 continue
-            log(f"  trending {lang or 'all'}/{period}: {len(found)}")
+            rows = page.count('class="Box-row')
+            log(f"  trending {lang or 'all'}/{period}: {len(found)}" + (f" (page rows {rows})" if rows != len(found) else ""))
             names += [n for n in found if n not in names]
             time.sleep(1)
     return names
