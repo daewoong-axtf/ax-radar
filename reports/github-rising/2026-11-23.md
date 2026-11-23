@@ -18,6 +18,14 @@ TOP 시리즈 · 2026-11-23
 | 9 | [mdiri-ai/SoduWork](https://github.com/mdiri-ai/SoduWork) | ≈+6,841 | 새로 진입 | MIT | 팀과 에이전트가 요청을 주고받고 요청자 승인까지 관리하는 자체 호스팅 업무 엔진 | 여러 에이전트 하네스를 지원하지만 직접 설치·실행해야 해요. Python 3.12·Node 22 권장 (README) |
 | 10 | [nexu-io/openmotion](https://github.com/nexu-io/openmotion) | ≈+6,100 | 새로 진입 | Apache-2.0 | Claude Motion·CapCut 대안으로, 에이전트가 모션 그래픽 영상을 만들게 하는 오픈소스 도구 | Node.js 22.18 이상이 필요해요 (README) |
 
+## 💡 핵심 인사이트
+
+- **보안 에이전트가 2·3위로 새로 들어왔어요.** 버그 바운티 스킬 묶음(Claude-BugHunter)과 침투 테스트 플랫폼(ARTEX)이 나란히 약 +12,000이에요. 둘 다 허가받은 대상에만 써야 해요.
+- **코딩 에이전트를 "조종·관리"하는 도구가 강세예요.** t3code(4위), orca(6위, ▲3), SoduWork(9위)는 모두 여러 에이전트를 한곳에서 부리고 승인하는 도구예요.
+- **스킬 형태 배포가 계속 늘어요.** BugHunter, superpowers, openmotion 모두 Claude Code 플러그인·스킬로 설치하는 방식이에요.
+- **새 얼굴이 많은 주예요.** 10개 중 7개가 새로 진입했고, 지난주의 meta/astryx, deepseek-harness, vercel-labs/ui 등 6개가 순위에서 빠졌어요.
+- **새로 생긴 저장소의 성장이 빨라요.** rust-anything(+8,155)과 SoduWork(+6,841)는 이번 주에 생겨서 받은 별이 전부 이번 주 증가분이에요.
+
 ## 바로 써 보기 (설치 한 줄)
 
 **1위 morluto/rea**

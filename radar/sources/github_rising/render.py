@@ -1,6 +1,8 @@
 """Markdown report, Atom feed, Slack / Discord / webhook payloads."""
 from __future__ import annotations
 
+import re
+
 import html
 import json
 from datetime import datetime
@@ -77,6 +79,8 @@ def markdown(report: dict, cfg) -> str:
         cell = lambda s: (s or "-").replace("|", "\\|").replace("\n", " ")
         lines.append(f"| {it['rank']} | [{it['name']}]({it['html_url']}) | {fmt_gain(it)} | {it['change']} | "
                      f"{it.get('license') or '-'} | {cell(one_liner(it))} | {cell(caveat(it))} |")
+    if _insights(report):
+        lines += ["", "## 💡 핵심 인사이트", "", *("- " + x for x in _insights(report))]
     installs = [it for it in items if it.get("install")]
     if installs:
         lines += ["", "## 바로 써 보기 (설치 한 줄)", ""]
@@ -155,12 +159,22 @@ def write_feed(cfg) -> Path:
 
 # ---------------------------------------------------------------- push notifications
 
+def _insights(report: dict) -> list[str]:
+    """Weekly "핵심 인사이트" bullets written by the Claude task (markdown, **bold** allowed)."""
+    return [x.strip() for x in report.get("insights") or [] if x and x.strip()]
+
+
 def slack_payload(report: dict, cfg) -> dict:
     blocks = [
         {"type": "header", "text": {"type": "plain_text", "text": title_for(report, cfg)[:150]}},
         {"type": "context", "elements": [{"type": "mrkdwn", "text": f"집계 {_period(report)} · 후보: GitHub Trending + 검색 · 순위: 7일 별 증가 직접 집계"}]},
         {"type": "divider"},
     ]
+    ins = _insights(report)
+    if ins:
+        body = "\n".join("• " + re.sub(r"\*\*(.+?)\*\*", r"*\1*", x) for x in ins)
+        blocks += [{"type": "section", "text": {"type": "mrkdwn", "text": f"*💡 핵심 인사이트*\n{body}"[:2900]}},
+                   {"type": "divider"}]
     for it in report["items"]:
         text = (f"*{it['rank']}. <{it['html_url']}|{it['name']}>*  ⭐ {fmt_gain(it)}  ·  {it['change']}\n"
                 f"{one_liner(it)}\n_단, {caveat(it)}_")
@@ -176,6 +190,8 @@ def slack_payload(report: dict, cfg) -> dict:
 
 def discord_payload(report: dict, cfg) -> dict:
     lines = [f"**{title_for(report, cfg)}**", f"-# 집계 {_period(report)}"]
+    if _insights(report):
+        lines += ["**💡 핵심 인사이트**", *("• " + x for x in _insights(report)), ""]
     for it in report["items"]:
         lines.append(f"**{it['rank']}.** [{it['name']}](<{it['html_url']}>) ⭐ {fmt_gain(it)} · {it['change']} — {one_liner(it)}")
     content = "\n".join(lines)
@@ -229,6 +245,9 @@ def report_html(report: dict, cfg) -> str:
                if any(it.get("estimated") for it in items) else "") + '</div>',
             '<table class="rank"><thead><tr><th>순위</th><th>저장소</th><th>별 증가</th><th>지난주 대비</th>'
             '<th>라이선스</th><th>한 줄</th><th>단, 확인할 것</th></tr></thead><tbody>', *rows, '</tbody></table>']
+    if _insights(report):
+        lis = "".join("<li>" + re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", e(x)) + "</li>" for x in _insights(report))
+        body.append(f'<h2>💡 핵심 인사이트</h2><ul class="plain">{lis}</ul>')
     installs = [it for it in items if it.get("install")][:5]
     if installs:
         body.append('<h2>바로 써 보기 (설치 한 줄)</h2>')

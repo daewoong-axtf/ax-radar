@@ -146,5 +146,14 @@ class ScopeTest(unittest.TestCase):
         self.assertEqual([(r["rank"], r["name"]) for r in rep["items"]], [(1, "b/agent"), (2, "e/cli")])
         self.assertEqual(rep["excluded"][-1]["name"], "d/tool")
 
+
+class InsightsTest(unittest.TestCase):
+    def test_insights_in_slack(self):
+        from radar.sources.github_rising import render
+        rep = {"date": "2026-11-23", "items": [], "dropped": [], "insights": ["**보안 도구 강세.** 2·3위"],
+               "meta": {"since": "2026-11-16T07:00:00+09:00", "until": "2026-11-23T07:00:00+09:00", "candidates": 1}}
+        blocks = render.slack_payload(rep, CFG)["blocks"]
+        self.assertIn("*보안 도구 강세.*", blocks[3]["text"]["text"])
+
 if __name__ == "__main__":
     unittest.main()

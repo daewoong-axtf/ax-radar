@@ -85,8 +85,10 @@ def run(command: str, cfg: dict, gh, args, log=print) -> dict | None:
         if not reps:
             log("no report to enrich")
             return None
-        data = json.loads(open(args.file, encoding="utf-8").read())
-        data = data.get("items", data) if isinstance(data, dict) else data
+        raw = json.loads(open(args.file, encoding="utf-8").read())
+        # summaries file: a list of items, or {"items": [...], "insights": ["...", ...]}
+        insights = raw.get("insights") if isinstance(raw, dict) else None
+        data = raw.get("items", raw) if isinstance(raw, dict) else raw
         if isinstance(data, list):
             data = {d["name"]: d for d in data}
         for rep in reps:
@@ -96,6 +98,8 @@ def run(command: str, cfg: dict, gh, args, log=print) -> dict | None:
                 if s:
                     it.update({k: (s.get(k) or "").strip() for k in SUMMARY_FIELDS if k in s})
                     n += it in rep["items"]
+            if rep is reps[-1] and insights:
+                rep["insights"] = [str(x).strip() for x in insights if str(x).strip()][:5]
             if rep is reps[-1] and not rep.get("notified"):
                 # "exclude": "<이유>" from the weekly task = outside AI/LLM and developer tools
                 out = {k: v["exclude"].strip() for k, v in data.items() if (v.get("exclude") or "").strip()}

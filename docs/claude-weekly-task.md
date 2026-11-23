@@ -20,6 +20,9 @@ API 키 없이 Claude 예약 작업이 GitHub 급상승 BEST 10에 한국어 요
    **순위 범위 확인**: README를 읽고 AI/LLM이나 개발 도구가 아니면 그 항목에 `"exclude": "<이유>"`를 넣어요.
    이유는 `창작·디자인 도구`, `게임·일반 사용자용 앱`, `강의·자료·링크 모음`, `주제와 무관한 화제성 저장소` 중 하나예요.
    그러면 `enrich`가 그 항목을 "제외한 곳"으로 옮기고 예비 순위에서 다음 저장소를 올려요. 애매하면 빼지 않아요.
+   **핵심 인사이트**: 요약 파일을 `{"items": [위 목록], "insights": ["**한 줄 제목.** 숫자 근거가 있는 설명", ...]}` 형태로 쓰면
+   인사이트 3~5개가 Slack 메시지 위쪽, 웹 리포트, Discord에 "💡 핵심 인사이트"로 함께 나가요. 새로 진입·상승·하락, 주제 흐름을 숫자와 함께 써요.
+   Notion 상위 페이지에도 같은 인사이트를 써요.
 4. `python -m radar github_rising enrich --file summaries.json` 후 `data/github_rising/reports/`와
    `reports/`를 커밋해서 main에 push해요. push가 되면 Actions가 페이지·RSS·Slack을 보내요.
 
