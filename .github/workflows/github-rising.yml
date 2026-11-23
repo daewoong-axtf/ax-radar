@@ -25,6 +25,14 @@ on:
         description: "Slack/Discord/웹훅으로 보내기"
         default: true
         type: boolean
+      as_of:
+        description: "report만: 지난 주 리포트 날짜 (YYYY-MM-DD, 비우면 이번 주)"
+        required: false
+        default: ""
+      fresh:
+        description: "report만: 오늘 스냅샷을 새로 찍기"
+        default: false
+        type: boolean
 
 permissions:
   contents: write
@@ -54,7 +62,9 @@ jobs:
           case "${{ github.event_name }}" in
             workflow_dispatch)
               CMD="${{ inputs.command }}"
-              [ "${{ inputs.notify }}" = "true" ] || FLAGS="--no-notify" ;;
+              [ "${{ inputs.notify }}" = "true" ] || FLAGS="--no-notify"
+              [ -z "${{ inputs.as_of }}" ] || FLAGS="$FLAGS --as-of ${{ inputs.as_of }}"
+              [ "${{ inputs.fresh }}" != "true" ] || FLAGS="$FLAGS --fresh" ;;
             push) CMD=publish ;;
             schedule)
               case "${{ github.event.schedule }}" in

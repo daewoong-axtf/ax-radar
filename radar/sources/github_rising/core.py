@@ -149,7 +149,7 @@ STARS_QUERY = """query($owner:String!,$name:String!,$after:String){
       edges{starredAt} pageInfo{endCursor hasNextPage}}}}"""
 
 
-def _count_graphql(gh: GitHub, name: str, since: datetime, max_pages: int):
+def _count_graphql(gh: GitHub, name: str, since: datetime, max_pages: int, until: datetime | None = None):
     """Newest-first via GraphQL: no 40k limit, stops at the first star older than `since`."""
     owner, repo = name.split("/", 1)
     count, after = 0, None
@@ -159,16 +159,18 @@ def _count_graphql(gh: GitHub, name: str, since: datetime, max_pages: int):
         if conn is None:
             return None
         for edge in conn["edges"]:
-            if datetime.fromisoformat(edge["starredAt"].replace("Z", "+00:00")) < since:
+            ts = datetime.fromisoformat(edge["starredAt"].replace("Z", "+00:00"))
+            if ts < since:
                 return count, False
-            count += 1
+            if until is None or ts < until:
+                count += 1
         if not conn["pageInfo"]["hasNextPage"]:
             return count, False
         after = conn["pageInfo"]["endCursor"]
     return count, True
 
 
-def _count_rest(gh: GitHub, name: str, stars: int, since: datetime, max_pages: int):
+def _count_rest(gh: GitHub, name: str, stars: int, since: datetime, max_pages: int, until: datetime | None = None):
     """Oldest-first REST list walked backwards from the last page (only up to 40k stars)."""
     last = max(1, math.ceil(stars / 100))
     if last > 400:
@@ -183,25 +185,26 @@ def _count_rest(gh: GitHub, name: str, stars: int, since: datetime, max_pages: i
         older = False
         for row in rows:
             ts = datetime.fromisoformat(row["starred_at"].replace("Z", "+00:00"))
-            if ts >= since:
-                count += 1
-            else:
+            if ts < since:
                 older = True
+            elif until is None or ts < until:
+                count += 1
         if older:
             return count, False
     return count, False
 
 
-def count_recent_stars(gh: GitHub, name: str, stars: int, since: datetime, max_pages: int, errors: list | None = None):
+def count_recent_stars(gh: GitHub, name: str, stars: int, since: datetime, max_pages: int, errors: list | None = None,
+                       until: datetime | None = None):
     """Count stars given since `since`. Returns (count, capped) or None if it could not be counted."""
     for method in ("graphql", "rest"):
         if method == "graphql" and not getattr(gh, "token", None):
             continue
         try:
             if method == "graphql":
-                res = _count_graphql(gh, name, since, max_pages)
+                res = _count_graphql(gh, name, since, max_pages, until)
             else:
-                res = _count_rest(gh, name, stars, since, max_pages)
+                res = _count_rest(gh, name, stars, since, max_pages, until)
             if res is not None:
                 return res
         except GitHubError as e:
@@ -210,12 +213,17 @@ def count_recent_stars(gh: GitHub, name: str, stars: int, since: datetime, max_p
     return None
 
 
-def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print) -> tuple[list[dict], dict]:
+def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print,
+                  until: datetime | None = None) -> tuple[list[dict], dict]:
+    """`until` set = backfill: count stars given in [until - window, until) from stargazer history."""
     window = cfg["github_rising"]["report"]["window_days"]
-    base = find_base_snapshot(today, window)
-    since = datetime.fromisoformat(cur["taken_at"]) - timedelta(days=window)
-    meta = {"window_days": window, "until": cur["taken_at"], "since": since.isoformat(timespec="seconds"),
-            "base_snapshot": base[0] if base else None}
+    base = None if until else find_base_snapshot(today, window)
+    end = until or datetime.fromisoformat(cur["taken_at"])
+    since = end - timedelta(days=window)
+    meta = {"window_days": window, "until": end.isoformat(timespec="seconds"),
+            "since": since.isoformat(timespec="seconds"), "base_snapshot": base[0] if base else None}
+    if until:
+        meta["backfill"] = True
     base_repos = base[1]["repos"] if base else {}
     base_time = datetime.fromisoformat(base[1]["taken_at"]) if base else None
     if base:
@@ -227,6 +235,11 @@ def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print) -> tuple[li
             continue
         row = {"name": name, **r}
         created = datetime.fromisoformat(r["created_at"].replace("Z", "+00:00"))
+        if until and created >= until:
+            continue
+        if until:
+            need_boot.append(row)
+            continue
         if name in base_repos:
             row["gain"], row["method"] = r["stargazers_count"] - base_repos[name]["stargazers_count"], "snapshot"
         elif created >= (base_time or since):
@@ -252,8 +265,8 @@ def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print) -> tuple[li
         def work(row):
             if not ok[0] and len(errors) >= 20:  # token can't read stargazers at all: stop wasting calls
                 return row, None
-            res = count_recent_stars(gh, row["name"], row["stargazers_count"], since,
-                                     bcfg.get("max_pages_per_repo", 60), errors)
+            pages = bcfg.get("max_pages_per_repo", 60) * (2 if until else 1)
+            res = count_recent_stars(gh, row["name"], row["stargazers_count"], since, pages, errors, until)
             return row, res
 
         with ThreadPoolExecutor(8) as ex:

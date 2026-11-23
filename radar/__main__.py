@@ -33,6 +33,7 @@ def main(argv=None) -> int:
     p.add_argument("--dry-run", action="store_true", help="파일 저장·전송 없이 결과만 출력")
     p.add_argument("--fresh", action="store_true", help="오늘 수집분이 있어도 새로 수집")
     p.add_argument("--file", help="enrich: 요약 JSON 파일 경로")
+    p.add_argument("--as-of", dest="as_of", help="report: 지난 주 리포트 만들기 (YYYY-MM-DD, 그날 07:00 KST까지 7일)")
     args = p.parse_args(argv)
     mod = SOURCES[args.source]
     if args.command not in mod.COMMANDS:

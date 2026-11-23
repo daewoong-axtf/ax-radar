@@ -33,9 +33,8 @@ def _mode(cfg) -> str:
 
 
 def _rebuild(cfg) -> None:
-    latest = core.all_reports(1)
-    if latest:
-        render.write_markdown(latest[-1], cfg)
+    for rep in core.all_reports(1000):  # oldest first, so latest.md ends up as the newest
+        render.write_markdown(rep, cfg)
     render.write_feed(cfg)
     render.write_site(cfg)
 
@@ -93,7 +92,29 @@ def run(command: str, cfg: dict, gh, args, log=print) -> dict | None:
         log(f"publishing {rep['date']} (summaries: {'yes' if rep.get('enriched') else 'no'})")
         return {"payloads": render.payloads(rep, cfg)}
 
-    # report
+    # report (--as-of YYYY-MM-DD: backfill a past week from stargazer history, never notified)
+    as_of = getattr(args, "as_of", None)
+    if as_of:
+        from datetime import datetime
+        until = datetime.fromisoformat(f"{as_of}T07:00:00+09:00")
+        snaps = core.list_snapshots()
+        if not snaps:
+            log("backfill needs at least one snapshot for the candidate list")
+            return None
+        cur = core.load_snapshot(snaps[-1])
+        rows, meta = core.compute_gains(cfg, gh, cur, as_of, log, until=until)
+        top, dropped, prev = core.rank(cfg, rows, as_of)
+        report = {"date": as_of, "meta": meta,
+                  "items": [{k: it.get(k) for k in ITEM_FIELDS} for it in top],
+                  "dropped": dropped, "previous": prev["date"] if prev else None,
+                  "enriched": False, "notified": True}
+        if args.dry_run:
+            log(render.markdown(report, cfg))
+            return None
+        core.save_report(report)
+        _rebuild(cfg)
+        log(f"saved backfill report {as_of} ({len(top)} items, API calls: {gh.calls})")
+        return None
     today = core.now_local(cfg).strftime("%Y-%m-%d")
     snaps = core.list_snapshots()
     if not snaps or snaps[-1].stem != today or args.fresh:
