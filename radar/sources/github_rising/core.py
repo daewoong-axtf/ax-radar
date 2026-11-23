@@ -282,8 +282,8 @@ def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print,
         for err in errors[:3]:
             log(f"    {err}")
         if errors and not counted:
-            log("  hint: the default Actions token cannot read stargazers. Add a GH_PAT secret "
-                "(fine-grained, public repositories read-only) for exact first-week counts; "
+            log("  hint: this token cannot read stargazers. GH_PAT must be a classic personal access token "
+                "with no scopes (fine-grained tokens are refused) for exact first-week counts; "
                 "from the second week daily snapshots make this unnecessary.")
             meta["bootstrap_failed"] = True
     meta["candidates"] = len(rows)

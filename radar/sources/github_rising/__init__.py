@@ -111,6 +111,9 @@ def run(command: str, cfg: dict, gh, args, log=print) -> dict | None:
         if args.dry_run:
             log(render.markdown(report, cfg))
             return None
+        if not top:
+            log("backfill: nothing could be counted (token cannot read stargazers?) - not saved")
+            return None
         core.save_report(report)
         _rebuild(cfg)
         log(f"saved backfill report {as_of} ({len(top)} items, API calls: {gh.calls})")
