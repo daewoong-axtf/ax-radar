@@ -18,3 +18,22 @@ API 키 없이 Claude 예약 작업이 GitHub 급상승 BEST 10에 한국어 요
    별을 사서 올린 것처럼 보이는 저장소(내용 없는 README, 키워드 나열)는 caveat에 그렇게 적어요.
 4. `python -m radar github_rising enrich --file summaries.json` 후 `data/github_rising/reports/`와
    `reports/`를 커밋해서 main에 push해요. push가 되면 Actions가 페이지·RSS·Slack을 보내요.
+
+## Notion 적재 (2026-11-30부터)
+
+요약을 push한 뒤, 같은 주 리포트(`data/github_rising/reports/<date>.json`)의 10개 항목을 Notion "Github 트렌드 히스토리 DB"
+(`collection://dbd3d273-ae9b-83f3-9d42-87aeb4425e50`)에 Notion 커넥터로 넣어요. 한 줄 = 한 주 × 저장소 1개.
+
+| Notion 열 | 값 |
+|---|---|
+| 저장소명 (제목) | `name` (owner/repo) |
+| 기준 주차 | 리포트 날짜 (월요일, 날짜만) |
+| 순위 | `rank` |
+| 순위 변동 | `새로 진입` → `NEW`, `지난주 3위 ▼2` → `▼2`, 그대로·없음 → `-` |
+| 주간 획득 Star | `gain` |
+| 총 Star | `stargazers_count` |
+| 링크 | `html_url` |
+| 핵심 요약 | `one_liner` (`estimated`가 true면 끝에 ` (추정치)`) |
+
+같은 날짜에 같은 저장소명 줄이 있으면 새로 만들지 말고 고쳐요. 다른 저장소나 다른 날짜의 줄은 지우거나 고치지 않아요.
+Notion 커넥터가 없거나 실패해도 나머지 단계는 끝내고, 마지막 줄에 `Notion 적재 실패: <이유>`를 써요.
