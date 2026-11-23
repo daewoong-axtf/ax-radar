@@ -22,6 +22,29 @@ queries = [
   "topic:ai-coding stars:>200 pushed:>{since_7d}",
   "topic:rag stars:>1000 pushed:>{since_7d}",
   "topic:generative-ai stars:>1000 pushed:>{since_7d}",
+  # 2026-11-23 추가: 표기만 다른 에이전트·스킬·코딩 에이전트·MCP 토픽
+  "topic:agent-skills stars:>200 pushed:>{since_7d}",
+  "topic:skills stars:>500 pushed:>{since_7d}",
+  "topic:agentic-ai stars:>300 pushed:>{since_7d}",
+  "topic:multi-agent stars:>300 pushed:>{since_7d}",
+  "topic:coding-agent stars:>200 pushed:>{since_7d}",
+  "topic:codex stars:>300 pushed:>{since_7d}",
+  "topic:cursor stars:>500 pushed:>{since_7d}",
+  "topic:copilot stars:>500 pushed:>{since_7d}",
+  "topic:mcp-server stars:>300 pushed:>{since_7d}",
+  # 검색 증강·프롬프트·운영·로컬 실행
+  "topic:vector-database stars:>1000 pushed:>{since_7d}",
+  "topic:embeddings stars:>1000 pushed:>{since_7d}",
+  "topic:prompt-engineering stars:>500 pushed:>{since_7d}",
+  "topic:context-engineering stars:>200 pushed:>{since_7d}",
+  "topic:llmops stars:>500 pushed:>{since_7d}",
+  "topic:evals stars:>500 pushed:>{since_7d}",
+  "topic:ai-observability stars:>300 pushed:>{since_7d}",
+  "topic:local-llm stars:>500 pushed:>{since_7d}",
+  "topic:ollama stars:>1000 pushed:>{since_7d}",
+  "topic:inference stars:>1000 pushed:>{since_7d}",
+  # 범위가 넓은 토픽은 별 3천 개 이상만
+  "topic:ai stars:>3000 pushed:>{since_7d}",
 ]
 pages_per_query = 1        # 1페이지 = 100개
 keep_tracking_days = 35    # 한 번 후보가 된 레포는 이 기간 동안 매일 스냅샷에 포함돼요
@@ -43,6 +66,7 @@ keywords = [
   "language model", "transformer", "diffusion", "inference", "prompt", "embedding",
   "vector", "chatbot", "deepseek", "qwen", "llama", "mistral", "ml", "machine learning",
   "multimodal", "vlm", "speech", "tts", "asr", "fine-tun", "lora", "vibe coding",
+  "codex", "ollama",
 ]
 min_forks = 5              # 포크가 이보다 적으면 제외 (가짜 스타 스팸 방지)
 min_stars = 100
