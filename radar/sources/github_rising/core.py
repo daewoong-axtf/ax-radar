@@ -143,30 +143,33 @@ def eligible(name: str, r: dict, cfg) -> bool:
 
 # ---------------------------------------------------------------- star gains
 
-STARS_QUERY = """query($owner:String!,$name:String!,$after:String){
+STARS_QUERY = """query($owner:String!,$name:String!,$before:String){
   repository(owner:$owner,name:$name){
-    stargazers(first:100,after:$after,orderBy:{field:STARRED_AT,direction:DESC}){
-      edges{starredAt} pageInfo{endCursor hasNextPage}}}}"""
+    stargazers(last:100,before:$before,orderBy:{field:STARRED_AT,direction:ASC}){
+      edges{starredAt} pageInfo{startCursor hasPreviousPage}}}}"""
 
 
 def _count_graphql(gh: GitHub, name: str, since: datetime, max_pages: int, until: datetime | None = None):
-    """Newest-first via GraphQL: no 40k limit, stops at the first star older than `since`."""
+    """Walk backwards from the newest star (no 40k limit) and stop at the first star older than `since`."""
     owner, repo = name.split("/", 1)
-    count, after = 0, None
+    count, before, prev_ts = 0, None, None
     for _ in range(max_pages):
-        data = gh.graphql(STARS_QUERY, {"owner": owner, "name": repo, "after": after})
+        data = gh.graphql(STARS_QUERY, {"owner": owner, "name": repo, "before": before})
         conn = ((data or {}).get("repository") or {}).get("stargazers")
         if conn is None:
             return None
-        for edge in conn["edges"]:
+        for edge in reversed(conn["edges"]):  # page is oldest->newest; walk newest first
             ts = datetime.fromisoformat(edge["starredAt"].replace("Z", "+00:00"))
+            if prev_ts is not None and ts > prev_ts + timedelta(seconds=1):
+                raise GitHubError(0, f"stargazers not in time order for {name}")
+            prev_ts = ts
             if ts < since:
                 return count, False
             if until is None or ts < until:
                 count += 1
-        if not conn["pageInfo"]["hasNextPage"]:
+        if not conn["pageInfo"]["hasPreviousPage"]:
             return count, False
-        after = conn["pageInfo"]["endCursor"]
+        before = conn["pageInfo"]["startCursor"]
     return count, True
 
 
