@@ -37,7 +37,7 @@ config.toml            공통 [summary] [notify] + 소스별 [<소스>.*]
 
 웹페이지: https://daewoong-axtf.github.io/ax-radar/ (RSS: `/github-rising/feed.xml`)
 
-1. **후보 찾기**: 최근 생긴 인기 저장소, `ai-agents`·`mcp`·`llm`·`claude-code` 같은 토픽 저장소를 GitHub 검색으로 모아요. 한 번 후보가 된 저장소는 35일 동안 계속 추적해요.
+1. **후보 찾기**: 최근 생긴 인기 저장소, `ai-agents`·`mcp`·`llm`·`claude-code` 같은 토픽 저장소를 GitHub 검색으로 모으고, [GitHub Trending](https://github.com/trending)(일간·주간, 전체·주요 언어)에 오른 저장소도 매일 더해요. Trending은 후보를 찾는 데만 쓰고, 순위와 별 증가는 우리가 직접 세요. 한 번 후보가 된 저장소는 35일 동안 계속 추적해요.
 2. **별 증가**: 오늘 별 수 − 7일 전 별 수. 7일 전 기록이 없으면(첫 주) stargazers API의 "별 누른 시각"으로 직접 세요. 이번 주에 생긴 저장소는 전체 별 수가 곧 증가분이에요.
 3. **거르기**: 포크·보관 저장소, 포크 5개 미만, AI 키워드가 없는 저장소는 빼요. 별 대비 포크가 너무 적으면 "가짜 스타 의심" 경고를 달아요.
 4. **비교**: 지난주 리포트와 비교해서 `새로 진입`, `지난주 3위 ▲2`, 순위에서 **빠진 곳**을 보여 줘요.

@@ -4,7 +4,7 @@
   snapshot  후보 저장소들의 별 수 기록 (매일)
   report    7일 증가분으로 순위 계산 → 저장 + 페이지/RSS. summary.mode가 claude-task면 알림은 보류
   pending   최신 리포트에서 요약이 비어 있는 항목과 README 주소를 JSON으로 출력 (Claude 예약 작업용)
-  enrich    --file summaries.json 의 요약을 최신 리포트에 합치고 페이지/RSS 다시 만들기
+  enrich    --file summaries.json 의 요약을 저장된 모든 리포트(최신+백필)에 합치고 페이지/RSS 다시 만들기
   publish   페이지/RSS 다시 만들고, 아직 안 보낸 최신 리포트를 알림으로 보내기 (한 번만)
   resend    최신 리포트 알림을 다시 보내기 (테스트용)
   site      저장된 리포트로 페이지/RSS만 다시 만들기
@@ -77,24 +77,27 @@ def run(command: str, cfg: dict, gh, args, log=print) -> dict | None:
                           "notified": bool(rep and rep.get("notified")), "items": todo}, ensure_ascii=False, indent=1))
         return None
     if command == "enrich":
-        rep = _latest()
-        if not rep:
+        # Summaries are merged into every saved report that has the same repo (latest + backfills).
+        reps = core.all_reports(1000)
+        if not reps:
             log("no report to enrich")
             return None
         data = json.loads(open(args.file, encoding="utf-8").read())
         data = data.get("items", data) if isinstance(data, dict) else data
         if isinstance(data, list):
             data = {d["name"]: d for d in data}
-        n = 0
-        for it in rep["items"]:
-            s = data.get(it["name"])
-            if s:
-                it.update({k: (s.get(k) or "").strip() for k in SUMMARY_FIELDS if k in s})
-                n += 1
-        rep["enriched"] = True
-        core.save_report(rep)
+        for rep in reps:
+            n = 0
+            for it in rep["items"]:
+                s = data.get(it["name"])
+                if s:
+                    it.update({k: (s.get(k) or "").strip() for k in SUMMARY_FIELDS if k in s})
+                    n += 1
+            if n or rep is reps[-1]:
+                rep["enriched"] = True
+                core.save_report(rep)
+                log(f"enriched {n}/{len(rep['items'])} items in {rep['date']}")
         _rebuild(cfg)
-        log(f"enriched {n}/{len(rep['items'])} items in {rep['date']}")
         return None
     if command in ("publish", "resend"):
         _rebuild(cfg)

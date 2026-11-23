@@ -104,5 +104,23 @@ class Tests(unittest.TestCase):
         self.assertEqual(len(render.slack_payload(report, CFG)["blocks"]), 3 + 3 + 2 + 1)  # header,context,divider + items + dropped(divider,section) + link
 
 
+
+class TrendingParseTest(unittest.TestCase):
+    def test_parse_trending(self):
+        from radar.sources.github_rising.core import parse_trending
+        page = """
+<article class="Box-row">
+  <div class="float-right"><a href="/login?return_to=%2Fmeta%2Fastryx">Star</a></div>
+  <h2 class="h3 lh-condensed">
+    <a data-hydro-click="{}" href="/meta/astryx" class="Link">
+      <svg></svg><span class="text-normal">meta /</span> astryx</a>
+  </h2>
+  <a href="/meta/astryx/stargazers">32,313</a>
+</article>
+<article class="Box-row"><h2 class="h3 lh-condensed"><a href="/GoogleChrome/modern-web-guidance">x</a></h2></article>
+<article class="Box-row"><h2 class="h3"><a href="/meta/astryx">dup</a></h2></article>
+"""
+        self.assertEqual(parse_trending(page), ["meta/astryx", "GoogleChrome/modern-web-guidance"])
+
 if __name__ == "__main__":
     unittest.main()

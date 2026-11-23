@@ -4,6 +4,9 @@ from __future__ import annotations
 import json
 import math
 import re
+import time
+import urllib.parse
+import urllib.request
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -45,6 +48,44 @@ def _write_json(path: Path, obj) -> None:
 
 # ---------------------------------------------------------------- snapshot
 
+TRENDING_URL = "https://github.com/trending/{lang}?since={period}"
+_ARTICLE = re.compile(r'<article[^>]*class="[^"]*Box-row[^"]*"[^>]*>(.*?)</article>', re.S)
+_H2_LINK = re.compile(r'<h2[^>]*>.*?href="/([A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+)"', re.S)
+
+
+def parse_trending(page: str) -> list[str]:
+    """owner/name list from a github.com/trending HTML page, in page order."""
+    names = []
+    for block in _ARTICLE.findall(page):
+        m = _H2_LINK.search(block)
+        if m and m.group(1) not in names:
+            names.append(m.group(1))
+    return names
+
+
+def fetch_trending(cfg, log=print) -> list[str]:
+    """Repos on GitHub Trending (no official API, so we read the HTML page).
+    Only used to find candidates; star gains are still counted by us."""
+    tcfg = cfg["github_rising"]["discovery"].get("trending", {})
+    if tcfg.get("enabled", True) is False:
+        return []
+    names: list[str] = []
+    for lang in tcfg.get("languages", [""]):
+        for period in tcfg.get("periods", ["daily", "weekly"]):
+            url = TRENDING_URL.format(lang=urllib.parse.quote(lang), period=period).replace("trending/?", "trending?")
+            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (ax-radar)", "Accept": "text/html"})
+            try:
+                with urllib.request.urlopen(req, timeout=30) as resp:
+                    found = parse_trending(resp.read().decode("utf-8", "replace"))
+            except Exception as e:  # trending is a bonus source; never fail the snapshot over it
+                log(f"  trending {lang or 'all'}/{period} failed: {e}")
+                continue
+            log(f"  trending {lang or 'all'}/{period}: {len(found)}")
+            names += [n for n in found if n not in names]
+            time.sleep(1)
+    return names
+
+
 def take_snapshot(cfg, gh: GitHub, log=print) -> dict:
     today = now_local(cfg)
     fmt = lambda days: (today - timedelta(days=days)).strftime("%Y-%m-%d")
@@ -66,7 +107,9 @@ def take_snapshot(cfg, gh: GitHub, log=print) -> dict:
     state = _read_json(STATE_FILE, {"tracked": {}})
     cutoff = fmt(disc.get("keep_tracking_days", 35))
     tracked = {k: v for k, v in state.get("tracked", {}).items() if v >= cutoff}
-    missing = [n for n in tracked if n not in repos]
+    trending = fetch_trending(cfg, log)
+    missing = [n for n in dict.fromkeys(list(tracked) + trending) if n not in repos]
+    log(f"  trending: {len(trending)} repos ({sum(1 for n in trending if n not in repos)} not found by search)")
 
     def fetch(name):
         try:
@@ -80,6 +123,8 @@ def take_snapshot(cfg, gh: GitHub, log=print) -> dict:
                 repos[info["html_url"].split("github.com/")[-1]] = info
             elif info is None:
                 tracked.pop(name, None)
+            elif name in trending and name not in tracked:
+                log(f"  could not fetch trending repo {name}")
     log(f"  refreshed {len(missing)} tracked repos")
 
     stamp = today.strftime("%Y-%m-%d")
