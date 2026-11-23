@@ -60,8 +60,8 @@ def markdown(report: dict, cfg) -> str:
     methods = {it.get("method") for it in items}
     lines = [f"# {title_for(report, cfg)}", "",
              f"TOP 시리즈 · {report['date']}", "",
-             f"> 집계 기간: {_period(report)}. GitHub API로 별 수를 직접 세서 만든 순위예요. "
-             "GitHub 공식 트렌딩 순위가 아니에요."]
+             f"> 집계 기간: {_period(report)}. "
+             "GitHub Trending과 검색으로 후보를 모으고, 지난 7일 동안 늘어난 별 수를 직접 세서 매긴 별 급상승 순위예요. GitHub 공식 Trending 순서와는 다를 수 있어요."]
     if report["meta"].get("bootstrap_failed"):
         lines.append("> 첫 주라 7일 전 기록이 없고 별 기록도 읽지 못해서, 이번 주에 새로 생긴 저장소만 집계했어요. "
                      "다음 주부터는 매일 기록과 비교해서 전체 후보를 집계해요.")
@@ -154,7 +154,7 @@ def write_feed(cfg) -> Path:
 def slack_payload(report: dict, cfg) -> dict:
     blocks = [
         {"type": "header", "text": {"type": "plain_text", "text": title_for(report, cfg)[:150]}},
-        {"type": "context", "elements": [{"type": "mrkdwn", "text": f"집계 {_period(report)} · GitHub API 직접 집계 (공식 트렌딩 아님)"}]},
+        {"type": "context", "elements": [{"type": "mrkdwn", "text": f"집계 {_period(report)} · 후보: GitHub Trending + 검색 · 순위: 7일 별 증가 직접 집계"}]},
         {"type": "divider"},
     ]
     for it in report["items"]:
@@ -214,8 +214,8 @@ def report_html(report: dict, cfg) -> str:
     body = [f'<a class="back" href="../">← 모든 리포트</a>',
             f'<div class="meta">TOP 시리즈 · {e(report["date"])}</div>',
             f'<h1>{e(title_for(report, cfg))}</h1>',
-            f'<div class="note">집계 기간: {e(_period(report))}. GitHub API로 별 수를 직접 세서 만든 순위예요. '
-            'GitHub 공식 트렌딩 순위가 아니에요.'
+            f'<div class="note">집계 기간: {e(_period(report))}. '
+            'GitHub Trending과 검색으로 후보를 모으고, 지난 7일 동안 늘어난 별 수를 직접 세서 매긴 별 급상승 순위예요. GitHub 공식 Trending 순서와는 다를 수 있어요.'
             + (' 7일 전 기록이 없는 저장소는 별 누른 시각으로 셌고, <code>+N+</code>는 상한까지만 센 값이에요.'
                if any(it.get("method") == "stargazers" for it in items) else "")
             + (' 첫 주라 이번 주에 새로 생긴 저장소만 집계했어요. 다음 주부터 전체 후보를 집계해요.'
