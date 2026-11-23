@@ -264,8 +264,17 @@ def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print,
 
     bcfg = cfg["github_rising"]["bootstrap"]
     if need_boot and bcfg.get("enabled", True) and bcfg.get("gharchive", True):
-        counts = gharchive_star_counts([r["name"] for r in need_boot], since, end, log)
+        new_rows = [r for r in rows if r.get("method") == "new"]
+        counts = gharchive_star_counts([r["name"] for r in need_boot + new_rows], since, end, log)
         if counts is not None:
+            # calibration: repos created inside the window have exact gains (= total stars)
+            cal = sorted(new_rows, key=lambda r: r["gain"], reverse=True)[:5]
+            for r in cal:
+                log(f"    calibration {r['name']}: total {r['gain']} vs gharchive {counts.get(r['name'])}")
+            ratios = [counts.get(r["name"], 0) / r["gain"] for r in cal if r["gain"] >= 200]
+            if ratios:
+                meta["gharchive_coverage"] = round(sorted(ratios)[len(ratios) // 2], 3)
+                log(f"    gharchive coverage (median) {meta['gharchive_coverage']}")
             for row in need_boot:
                 row["gain"], row["method"] = counts.get(row["name"], 0), "gharchive"
                 rows.append(row)
