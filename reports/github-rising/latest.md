@@ -7,16 +7,49 @@ TOP 시리즈 · 2026-11-23
 
 | 순위 | 저장소 | 별 증가 | 지난주 대비 | 라이선스 | 한 줄 | 단, 확인할 것 |
 |---|---|---|---|---|---|---|
-| 1 | [morluto/rea](https://github.com/morluto/rea) | ≈+14,300 | 지난주 1위 = | MIT | Reverse engineer anything with agents, from app behavior down to native binaries. | - |
-| 2 | [elementalsouls/Claude-BugHunter](https://github.com/elementalsouls/Claude-BugHunter) | ≈+12,200 | 새로 진입 | MIT | A Claude Code skill bundle for bug hunting and external red-team work - 82 skills, 15 slash commands, 681 disclosed-report patterns curated across 24 core vulnerability classes, plus enterprise identity + infrastructure attack matrices. | - |
-| 3 | [BaaRai/ARTEX](https://github.com/BaaRai/ARTEX) | ≈+12,200 | 새로 진입 | AGPL-3.0 | ARTEX - AI autonomous penetration testing system (English translation; upstream: Autumn-27/ARTEX, AGPL-3.0) | - |
-| 4 | [pingdotgg/t3code](https://github.com/pingdotgg/t3code) | ≈+11,200 | 지난주 4위 = | MIT | The best way to control Claude Code, Codex and more from any computer or phone | - |
-| 5 | [Ebony-Vinyl/dsh-our-free-model](https://github.com/Ebony-Vinyl/dsh-our-free-model) | ≈+10,300 | 지난주 3위 ▼2 | - | 在 dsh 里装上这个插件即可，无需登录、注册或填 API Key，就能使用包括 DeepSeek V4.1 Flash、Kimi K3 在内的前沿模型——完全免费，不限量。 All you do is install this plugin in dsh: no login, no sign-up, no API key — the frontier models are just there, DeepSeek V4.1 Flash and Kimi K3 among them. Completely free, with no usage cap. | 라이선스 표기 없음 |
-| 6 | [stablyai/orca](https://github.com/stablyai/orca) | ≈+9,600 | 지난주 9위 ▲3 | MIT | Orca lets you run a fleet of bots with your own subscription (e.g. Claude Code, Grok, Agy, Codex). Available on desktop, mobile and remote runtime. | - |
-| 7 | [erkamyaman/rust-anything](https://github.com/erkamyaman/rust-anything) | +8,155 | 새로 진입 | MIT | Rewrite your whole app in Rust, one piece at a time, checked against the original's recorded behavior at every step. CLIs, HTTP servers and libraries in TypeScript, Python, C, Go, Ruby and Java. | - |
-| 8 | [obra/superpowers](https://github.com/obra/superpowers) | ≈+7,300 | 새로 진입 | MIT | An agentic skills framework & software development methodology that works. | - |
-| 9 | [mdiri-ai/SoduWork](https://github.com/mdiri-ai/SoduWork) | ≈+6,841 | 새로 진입 | MIT | The AI-native engine for teams and their agents. Multi-harness, multi-agent, self-hosted. | - |
-| 10 | [nexu-io/openmotion](https://github.com/nexu-io/openmotion) | ≈+6,100 | 새로 진입 | Apache-2.0 | The open-source Claude Motion & CapCut alternative. Turn a reference video into editable motion graphics with your brand kit. Export MP4s for YouTube, YouTube Shorts, Instagram Reels, and TikTok. A full-stack agentic video studio with 300+ Motion.md guides and support for 22 agents, including Claude Code, Codex, DSH, and WorkBuddy. | - |
+| 1 | [morluto/rea](https://github.com/morluto/rea) | ≈+14,300 | 지난주 1위 = | MIT | 바이너리·앱 동작까지 에이전트로 역공학하는 MCP 도구 | 분석할 권한이 있는 앱·바이너리에만 쓰세요 |
+| 2 | [elementalsouls/Claude-BugHunter](https://github.com/elementalsouls/Claude-BugHunter) | ≈+12,200 | 새로 진입 | MIT | Claude Code를 버그 바운티·레드팀 연구자처럼 쓰게 해 주는 보안 스킬 묶음 (83개) | 허가받은 대상에만 쓰세요. 후원사가 있는 개인 프로젝트예요 |
+| 3 | [BaaRai/ARTEX](https://github.com/BaaRai/ARTEX) | ≈+12,200 | 새로 진입 | AGPL-3.0 | 여러 에이전트가 실제 도구로 침투 테스트를 하고 증거를 남기는 자체 호스팅 플랫폼 | 허가받은 대상에만 쓰세요. 원본(Autumn-27/ARTEX)을 가져온 저장소이고 AGPL-3.0이에요 (README) |
+| 4 | [pingdotgg/t3code](https://github.com/pingdotgg/t3code) | ≈+11,200 | 지난주 4위 = | MIT | Claude Code·Codex 등 내 컴퓨터의 코딩 에이전트를 한 화면과 휴대폰에서 조종하는 앱 | 에이전트가 먼저 내 컴퓨터에 설치·로그인돼 있어야 해요 (README) |
+| 5 | [Ebony-Vinyl/dsh-our-free-model](https://github.com/Ebony-Vinyl/dsh-our-free-model) | ≈+10,300 | 지난주 3위 ▼2 | - | DeepSeek Harness(dsh)에 붙이면 로그인·API 키 없이 여러 최신 모델을 무료로 쓰게 해 주는 플러그인 | 베타예요. 출처가 불분명한 무료 모델 중계라 이용약관·데이터 유출 위험을 먼저 확인하세요 · 라이선스 표기 없음 |
+| 6 | [stablyai/orca](https://github.com/stablyai/orca) | ≈+9,600 | 지난주 9위 ▲3 | MIT | 코딩 에이전트 여러 개를 한 IDE에서 동시에 돌리고 Slack·휴대폰에서 지시하는 앱 | Claude Code나 Codex는 직접 준비해야 해요 |
+| 7 | [erkamyaman/rust-anything](https://github.com/erkamyaman/rust-anything) | +8,155 | 새로 진입 | MIT | 앱을 조각조각 Rust로 옮기고, 원본과 똑같이 동작하는지 기록으로 검증하는 도구 | Rust 코드는 내 코딩 에이전트(Claude Code 등)가 써요. PHP·C#은 함수 단위 포팅만 돼요 (README) |
+| 8 | [obra/superpowers](https://github.com/obra/superpowers) | ≈+7,300 | 새로 진입 | MIT | 코딩 에이전트가 요구사항 정리, 설계, 계획, TDD, 리뷰 순서로 일하게 만드는 스킬 모음 | 에이전트가 몇 시간씩 혼자 작업할 수 있어서 토큰 사용량을 지켜보세요. 시각 도구에는 원격 측정이 있어요 (README) |
+| 9 | [mdiri-ai/SoduWork](https://github.com/mdiri-ai/SoduWork) | ≈+6,841 | 새로 진입 | MIT | 팀과 에이전트가 요청을 주고받고 요청자 승인까지 관리하는 자체 호스팅 업무 엔진 | 여러 에이전트 하네스를 지원하지만 직접 설치·실행해야 해요. Python 3.12·Node 22 권장 (README) |
+| 10 | [nexu-io/openmotion](https://github.com/nexu-io/openmotion) | ≈+6,100 | 새로 진입 | Apache-2.0 | Claude Motion·CapCut 대안으로, 에이전트가 모션 그래픽 영상을 만들게 하는 오픈소스 도구 | Node.js 22.18 이상이 필요해요 (README) |
+
+## 바로 써 보기 (설치 한 줄)
+
+**1위 morluto/rea**
+
+```bash
+npx rea-agents setup
+```
+
+**2위 elementalsouls/Claude-BugHunter**
+
+```bash
+/plugin marketplace add elementalsouls/Claude-BugHunter
+```
+
+**3위 BaaRai/ARTEX**
+
+```bash
+git clone https://github.com/BaaRai/ARTEX.git && cd ARTEX && docker compose up -d --build
+```
+
+**4위 pingdotgg/t3code**
+
+```bash
+curl -fsSL https://t3.codes/install.sh | sh
+```
+
+**5위 Ebony-Vinyl/dsh-our-free-model**
+
+```bash
+dsh plugin --profile web add <내려받은 폴더 경로>
+```
+
 
 ## 빠진 곳
 
