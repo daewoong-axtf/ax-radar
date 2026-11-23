@@ -60,6 +60,9 @@ def markdown(report: dict, cfg) -> str:
              f"TOP 시리즈 · {report['date']}", "",
              f"> 집계 기간: {_period(report)}. GitHub API로 별 수를 직접 세서 만든 순위예요. "
              "GitHub 공식 트렌딩 순위가 아니에요."]
+    if report["meta"].get("bootstrap_failed"):
+        lines.append("> 첫 주라 7일 전 기록이 없고 별 기록도 읽지 못해서, 이번 주에 새로 생긴 저장소만 집계했어요. "
+                     "다음 주부터는 매일 기록과 비교해서 전체 후보를 집계해요.")
     if "stargazers" in methods:
         lines.append("> 7일 전 기록이 없는 저장소는 stargazers API의 별 누른 시각으로 셌어요. "
                      "`+N+`는 상한까지만 센 값이에요.")
@@ -209,7 +212,9 @@ def report_html(report: dict, cfg) -> str:
             f'<div class="note">집계 기간: {e(_period(report))}. GitHub API로 별 수를 직접 세서 만든 순위예요. '
             'GitHub 공식 트렌딩 순위가 아니에요.'
             + (' 7일 전 기록이 없는 저장소는 별 누른 시각으로 셌고, <code>+N+</code>는 상한까지만 센 값이에요.'
-               if any(it.get("method") == "stargazers" for it in items) else "") + '</div>',
+               if any(it.get("method") == "stargazers" for it in items) else "")
+            + (' 첫 주라 이번 주에 새로 생긴 저장소만 집계했어요. 다음 주부터 전체 후보를 집계해요.'
+               if report["meta"].get("bootstrap_failed") else "") + '</div>',
             '<table class="rank"><thead><tr><th>순위</th><th>저장소</th><th>별 증가</th><th>지난주 대비</th>'
             '<th>라이선스</th><th>한 줄</th><th>단, 확인할 것</th></tr></thead><tbody>', *rows, '</tbody></table>']
     installs = [it for it in items if it.get("install")][:5]

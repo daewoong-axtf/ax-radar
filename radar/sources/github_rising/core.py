@@ -247,8 +247,11 @@ def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print) -> tuple[li
         log(f"  counting recent stargazers for {len(todo)} repos (no base snapshot)")
 
         errors: list[str] = []
+        ok = [0]
 
         def work(row):
+            if not ok[0] and len(errors) >= 20:  # token can't read stargazers at all: stop wasting calls
+                return row, None
             res = count_recent_stars(gh, row["name"], row["stargazers_count"], since,
                                      bcfg.get("max_pages_per_repo", 60), errors)
             return row, res
@@ -257,13 +260,19 @@ def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print) -> tuple[li
             for row, res in ex.map(work, todo):
                 if res is None:
                     continue
+                ok[0] += 1
                 row["gain"], row["capped"] = res
                 row["method"] = "stargazers"
                 rows.append(row)
         counted = sum(1 for r in rows if r.get("method") == "stargazers")
         log(f"  counted {counted}/{len(todo)} repos; {len(errors)} errors")
-        for err in errors[:5]:
+        for err in errors[:3]:
             log(f"    {err}")
+        if errors and not counted:
+            log("  hint: the default Actions token cannot read stargazers. Add a GH_PAT secret "
+                "(fine-grained, public repositories read-only) for exact first-week counts; "
+                "from the second week daily snapshots make this unnecessary.")
+            meta["bootstrap_failed"] = True
     meta["candidates"] = len(rows)
     return rows, meta
 

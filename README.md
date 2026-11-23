@@ -56,7 +56,7 @@ config.toml            공통 [summary] [notify] + 소스별 [<소스>.*]
    | `DISCORD_WEBHOOK_URL` | 선택 | Discord 채널 웹훅 |
    | `GENERIC_WEBHOOK_URL` | 선택 | 결과 JSON을 받을 주소 (n8n, Zapier, 사내 봇 등) |
    | `ANTHROPIC_API_KEY` | 선택 | `summary.mode = "api"`일 때만 |
-   | `GH_PAT` | 권장 | 권한 없는 개인 토큰 (public repo 읽기). 없으면 기본 토큰(시간당 1,000회)을 써요 |
+   | `GH_PAT` | 권장 | 개인 토큰 (fine-grained, Public repositories 읽기 전용). 기본 Actions 토큰은 별 누른 기록을 못 읽어서, 이게 없으면 첫 주에는 새로 생긴 저장소만 집계돼요 |
 
    소스마다 다른 채널로 보내려면 이름 뒤에 `_<소스 대문자>`를 붙여요. 예: `SLACK_WEBHOOK_URL_GITHUB_RISING`.
    (워크플로의 `env:`에도 같은 이름을 추가해 주세요.)
