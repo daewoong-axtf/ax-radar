@@ -1,0 +1,71 @@
+# ax-radar 설정
+# 공통 섹션: summary, notify / 소스별 섹션: github_rising.* (소스를 추가하면 <소스이름>.* 로 늘어나요)
+
+[github_rising.report]
+top_n = 10                 # 순위표에 올릴 개수
+window_days = 7            # 별 증가를 세는 기간 (일)
+title_prefix = "GitHub 별 급상승 AI·개발 도구"
+timezone_offset_hours = 9  # KST
+
+[github_rising.discovery]
+# 후보를 찾는 GitHub 검색 쿼리. {since_7d}, {since_30d}, {since_90d} 는 날짜(YYYY-MM-DD)로 바뀌어요.
+# 쿼리 1개당 검색 API 1~2회 (최대 200개) 를 써요. 검색 한도는 토큰 기준 30회/분이에요.
+queries = [
+  "created:>{since_30d} stars:>150",
+  "created:>{since_90d} stars:>800",
+  "topic:ai-agents stars:>300 pushed:>{since_7d}",
+  "topic:agents stars:>300 pushed:>{since_7d}",
+  "topic:llm stars:>1000 pushed:>{since_7d}",
+  "topic:mcp stars:>300 pushed:>{since_7d}",
+  "topic:model-context-protocol stars:>300 pushed:>{since_7d}",
+  "topic:claude-code stars:>200 pushed:>{since_7d}",
+  "topic:ai-coding stars:>200 pushed:>{since_7d}",
+  "topic:rag stars:>1000 pushed:>{since_7d}",
+  "topic:generative-ai stars:>1000 pushed:>{since_7d}",
+]
+pages_per_query = 1        # 1페이지 = 100개
+keep_tracking_days = 35    # 한 번 후보가 된 레포는 이 기간 동안 매일 스냅샷에 포함돼요
+
+[github_rising.filter]
+# true면 이름·설명·토픽에 아래 키워드가 있는 레포만 순위에 올려요.
+ai_only = true
+keywords = [
+  "ai", "agent", "agents", "agentic", "llm", "llms", "gpt", "claude", "gemini", "openai",
+  "anthropic", "mcp", "model context protocol", "rag", "copilot", "coding assistant",
+  "language model", "transformer", "diffusion", "inference", "prompt", "embedding",
+  "vector", "chatbot", "deepseek", "qwen", "llama", "mistral", "ml", "machine learning",
+  "multimodal", "vlm", "speech", "tts", "asr", "fine-tun", "lora", "vibe coding",
+]
+min_forks = 5              # 포크가 이보다 적으면 제외 (가짜 스타 스팸 방지)
+min_stars = 100
+exclude = [                 # 영구 제외할 저장소 (owner/name)
+]
+# 별 대비 포크 비율이 이보다 낮으면 "가짜 스타 의심" 경고를 달아요 (제외는 안 해요).
+suspicious_fork_ratio = 0.01
+
+[github_rising.bootstrap]
+# 7일 전 스냅샷이 없을 때(첫 주) stargazers API의 starred_at으로 직접 세요.
+enabled = true
+max_pages_per_repo = 40    # 1페이지=100개. 4,000개 넘게 오른 레포는 "4,000+"로 표시돼요
+max_repos = 250            # 비용 제한: 하루 평균 별 증가가 큰 순으로 이 개수까지만 세요
+
+[summary]
+# 한국어 "한 줄 / 단, 확인할 것 / 설치 한 줄"을 누가 쓸지 정해요.
+#  "claude-task": API 키 없이. 리포트는 알림 없이 저장되고, 매주 Claude 예약 작업이 요약을 채워 push하면
+#                 그때 페이지·RSS·Slack이 나가요. 요약이 11:00 KST까지 안 오면 설명만으로 그냥 보내요.
+#  "api":         ANTHROPIC_API_KEY로 리포트를 만들 때 바로 요약하고 바로 알림을 보내요.
+#  "off":         요약 없이 저장소 설명만 써서 바로 알림을 보내요.
+mode = "claude-task"
+model = "claude-opus-5-5"
+readme_max_chars = 12000   # README 앞부분만 보내요 (한 줄 요약용이라 충분해요)
+
+[notify]
+# 비밀값은 환경변수로 넣어요: SLACK_WEBHOOK_URL, DISCORD_WEBHOOK_URL, GENERIC_WEBHOOK_URL
+# 소스별로 다른 채널에 보내려면 뒤에 _<소스이름 대문자>를 붙여요. 예: SLACK_WEBHOOK_URL_GITHUB_RISING
+slack = true
+discord = true
+generic_webhook = true
+
+[site]
+# GitHub Pages 주소. 알림·RSS 안의 링크에 써요. (Settings → Pages → Source: GitHub Actions)
+base_url = "https://daewoong-axtf.github.io/ax-radar"
