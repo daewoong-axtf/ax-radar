@@ -271,13 +271,25 @@ def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print,
             cal = sorted(new_rows, key=lambda r: r["gain"], reverse=True)[:5]
             for r in cal:
                 log(f"    calibration {r['name']}: total {r['gain']} vs gharchive {counts.get(r['name'])}")
-            ratios = [counts.get(r["name"], 0) / r["gain"] for r in cal if r["gain"] >= 200]
+            ratios = [counts.get(r["name"], 0) / r["gain"] for r in cal if r["gain"] >= 200 and counts.get(r["name"])]
             if ratios:
                 meta["gharchive_coverage"] = round(sorted(ratios)[len(ratios) // 2], 3)
                 log(f"    gharchive coverage (median) {meta['gharchive_coverage']}")
+            coverage = meta.get("gharchive_coverage")
+            if coverage is None or len(ratios) < 3:
+                coverage = _last_coverage() or coverage
             for row in need_boot:
-                row["gain"], row["method"] = counts.get(row["name"], 0), "gharchive"
+                raw = counts.get(row["name"], 0)
+                row["method"], row["gharchive_raw"] = "gharchive", raw
+                if coverage:
+                    # GH Archive here is a small sample of all events: scale back up to an estimate
+                    est = raw / coverage
+                    row["gain"] = int(round(est, -2 if est >= 1000 else -1))
+                    row["estimated"] = True
+                else:
+                    row["gain"] = raw
                 rows.append(row)
+            meta["gharchive_coverage_used"] = coverage
             need_boot = []
             meta["source"] = "gharchive"
     if need_boot and bcfg.get("enabled", True):
@@ -321,6 +333,14 @@ def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print,
 
 
 # ---------------------------------------------------------------- GH Archive (public ClickHouse)
+
+def _last_coverage() -> float | None:
+    for rep in reversed(all_reports(1000)):
+        c = rep.get("meta", {}).get("gharchive_coverage")
+        if c:
+            return c
+    return None
+
 
 CLICKHOUSE_URL = "https://play.clickhouse.com/?user=play"
 

@@ -18,7 +18,7 @@ from ...summarize import summarize
 
 ITEM_FIELDS = ("rank", "name", "html_url", "gain", "capped", "method", "stargazers_count", "forks_count",
                "change", "prev_rank", "license", "language", "description", "topics", "created_at", "suspicious",
-               "one_liner", "caveat", "install", "category")
+               "one_liner", "caveat", "install", "category", "estimated")
 SUMMARY_FIELDS = ("one_liner", "caveat", "install", "category")
 
 COMMANDS = ("snapshot", "report", "pending", "enrich", "publish", "resend", "site")

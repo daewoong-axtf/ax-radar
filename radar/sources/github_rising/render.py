@@ -29,6 +29,8 @@ def fmt_gain(it: dict) -> str:
     g = it.get("gain")
     if g is None:
         return "?"
+    if it.get("estimated"):
+        return f"≈+{g:,}"
     return f"+{g:,}" + ("+" if it.get("capped") else "")
 
 
@@ -63,6 +65,9 @@ def markdown(report: dict, cfg) -> str:
     if report["meta"].get("bootstrap_failed"):
         lines.append("> 첫 주라 7일 전 기록이 없고 별 기록도 읽지 못해서, 이번 주에 새로 생긴 저장소만 집계했어요. "
                      "다음 주부터는 매일 기록과 비교해서 전체 후보를 집계해요.")
+    if any(it.get("estimated") for it in items):
+        lines.append("> `≈`는 추정치예요. 7일 전 기록이 없어서 공개 GH Archive 표본으로 세고, "
+                     "이번 주 새로 생긴 저장소로 비율을 맞춰 전체 별 수로 환산했어요. 순서는 믿을 만하지만 숫자는 ±25% 정도 차이 날 수 있어요.")
     if "stargazers" in methods:
         lines.append("> 7일 전 기록이 없는 저장소는 stargazers API의 별 누른 시각으로 셌어요. "
                      "`+N+`는 상한까지만 센 값이에요.")
@@ -214,7 +219,10 @@ def report_html(report: dict, cfg) -> str:
             + (' 7일 전 기록이 없는 저장소는 별 누른 시각으로 셌고, <code>+N+</code>는 상한까지만 센 값이에요.'
                if any(it.get("method") == "stargazers" for it in items) else "")
             + (' 첫 주라 이번 주에 새로 생긴 저장소만 집계했어요. 다음 주부터 전체 후보를 집계해요.'
-               if report["meta"].get("bootstrap_failed") else "") + '</div>',
+               if report["meta"].get("bootstrap_failed") else "")
+            + (' <b>≈</b>는 추정치예요. 7일 전 기록이 없어서 공개 GH Archive 표본으로 세고 비율을 맞춰 환산했어요 '
+               '(순서는 믿을 만하지만 숫자는 ±25% 정도 차이 날 수 있어요). 매일 기록이 쌓이는 다음 주부터는 정확한 값이에요.'
+               if any(it.get("estimated") for it in items) else "") + '</div>',
             '<table class="rank"><thead><tr><th>순위</th><th>저장소</th><th>별 증가</th><th>지난주 대비</th>'
             '<th>라이선스</th><th>한 줄</th><th>단, 확인할 것</th></tr></thead><tbody>', *rows, '</tbody></table>']
     installs = [it for it in items if it.get("install")][:5]
