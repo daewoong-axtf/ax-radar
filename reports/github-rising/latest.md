@@ -3,30 +3,29 @@
 TOP 시리즈 · 2026-11-23
 
 > 집계 기간: 2026-11-16 14:56 ~ 2026-11-23 14:56 (KST). GitHub API로 별 수를 직접 세서 만든 순위예요. GitHub 공식 트렌딩 순위가 아니에요.
+> `≈`는 추정치예요. 7일 전 기록이 없어서 공개 GH Archive 표본으로 세고, 이번 주 새로 생긴 저장소로 비율을 맞춰 전체 별 수로 환산했어요. 순서는 믿을 만하지만 숫자는 ±25% 정도 차이 날 수 있어요.
 
 | 순위 | 저장소 | 별 증가 | 지난주 대비 | 라이선스 | 한 줄 | 단, 확인할 것 |
 |---|---|---|---|---|---|---|
-| 1 | [erkamyaman/rust-anything](https://github.com/erkamyaman/rust-anything) | +8,150 | 새로 진입 | MIT | Rewrite your whole app in Rust, one piece at a time, checked against the original's recorded behavior at every step. CLIs, HTTP servers and libraries in TypeScript, Python, C, Go, Ruby and Java. | - |
-| 2 | [bookwjitchieni1986/blender-ai-mcp-addon](https://github.com/bookwjitchieni1986/blender-ai-mcp-addon) | +2,756 | 새로 진입 | MIT | AI assistant and MCP server for Blender: visual chat, scene tools, multi-agent workflows. Works with ChatGPT/GPT, Claude, Gemini, Ollama, OpenCode. Blender AI addon, copilot for 3D, bpy Python scripting, MCP integration. | - |
-| 3 | [EL4CTEO/fast-anything](https://github.com/EL4CTEO/fast-anything) | +2,204 | 새로 진입 | MIT | Don't rewrite it in Rust. Rewrite the 5% that's slow: profile Python, Node or Ruby apps, port the hot functions with your coding agent, prove they behave the same. | - |
-| 4 | [iamajmeena/neonclipping](https://github.com/iamajmeena/neonclipping) | +2,143 | 새로 진입 | MIT | Paste a link, get captioned 9:16 clips in ~2 min. Free, local, open-source clipping engine (audio-first, YouTube captions, local LLM). | - |
-| 5 | [sybil-solutions/inference-optimisation-skill](https://github.com/sybil-solutions/inference-optimisation-skill) | +1,980 | 새로 진입 | MIT | Agent skill for hill-climbing local LLM serving speed (decode, speculative decoding, prefill, KV, startup, TTFT) on any hardware and quantization | - |
-| 6 | [INK-Q/agy-fast](https://github.com/INK-Q/agy-fast) | +611 | 새로 진입 | MIT | Non-invasive MCP accelerator plugin for Google Antigravity (CLI/Desktop/IDE): cuts LLM turns (-34%), token quota (-31%), and upload traffic (-40%) without affecting native UI or diffs. | - |
-| 7 | [morluto/rea](https://github.com/morluto/rea) | +158 | 지난주 1위 ▼6 | MIT | Reverse engineer anything with agents, from app behavior down to native binaries. | - |
-| 8 | [elementalsouls/Claude-BugHunter](https://github.com/elementalsouls/Claude-BugHunter) | +134 | 새로 진입 | MIT | A Claude Code skill bundle for bug hunting and external red-team work - 82 skills, 15 slash commands, 681 disclosed-report patterns curated across 24 core vulnerability classes, plus enterprise identity + infrastructure attack matrices. | - |
-| 9 | [BaaRai/ARTEX](https://github.com/BaaRai/ARTEX) | +133 | 새로 진입 | AGPL-3.0 | ARTEX - AI autonomous penetration testing system (English translation; upstream: Autumn-27/ARTEX, AGPL-3.0) | - |
-| 10 | [pingdotgg/t3code](https://github.com/pingdotgg/t3code) | +123 | 지난주 3위 ▼7 | MIT | The best way to control Claude Code, Codex and more from any computer or phone | - |
+| 1 | [morluto/rea](https://github.com/morluto/rea) | ≈+14,400 | 지난주 1위 = | MIT | Reverse engineer anything with agents, from app behavior down to native binaries. | - |
+| 2 | [elementalsouls/Claude-BugHunter](https://github.com/elementalsouls/Claude-BugHunter) | ≈+12,200 | 새로 진입 | MIT | A Claude Code skill bundle for bug hunting and external red-team work - 82 skills, 15 slash commands, 681 disclosed-report patterns curated across 24 core vulnerability classes, plus enterprise identity + infrastructure attack matrices. | - |
+| 3 | [BaaRai/ARTEX](https://github.com/BaaRai/ARTEX) | ≈+12,100 | 새로 진입 | AGPL-3.0 | ARTEX - AI autonomous penetration testing system (English translation; upstream: Autumn-27/ARTEX, AGPL-3.0) | - |
+| 4 | [pingdotgg/t3code](https://github.com/pingdotgg/t3code) | ≈+11,200 | 지난주 3위 ▼1 | MIT | The best way to control Claude Code, Codex and more from any computer or phone | - |
+| 5 | [Ebony-Vinyl/dsh-our-free-model](https://github.com/Ebony-Vinyl/dsh-our-free-model) | ≈+10,400 | 지난주 2위 ▼3 | - | 在 dsh 里装上这个插件即可，无需登录、注册或填 API Key，就能使用包括 DeepSeek V4.1 Flash、Kimi K3 在内的前沿模型——完全免费，不限量。 All you do is install this plugin in dsh: no login, no sign-up, no API key — the frontier models are just there, DeepSeek V4.1 Flash and Kimi K3 among them. Completely free, with no usage cap. | 라이선스 표기 없음 |
+| 6 | [stablyai/orca](https://github.com/stablyai/orca) | ≈+9,400 | 지난주 9위 ▲3 | MIT | Orca lets you run a fleet of bots with your own subscription (e.g. Claude Code, Grok, Agy, Codex). Available on desktop, mobile and remote runtime. | - |
+| 7 | [erkamyaman/rust-anything](https://github.com/erkamyaman/rust-anything) | +8,150 | 새로 진입 | MIT | Rewrite your whole app in Rust, one piece at a time, checked against the original's recorded behavior at every step. CLIs, HTTP servers and libraries in TypeScript, Python, C, Go, Ruby and Java. | - |
+| 8 | [mdiri-ai/SoduWork](https://github.com/mdiri-ai/SoduWork) | ≈+7,400 | 새로 진입 | MIT | The AI-native engine for teams and their agents. Multi-harness, multi-agent, self-hosted. | - |
+| 9 | [nexu-io/openmotion](https://github.com/nexu-io/openmotion) | ≈+6,100 | 새로 진입 | Apache-2.0 | The open-source Claude Motion & CapCut alternative. Turn a reference video into editable motion graphics with your brand kit. Export MP4s for YouTube, YouTube Shorts, Instagram Reels, and TikTok. A full-stack agentic video studio with 300+ Motion.md guides and support for 22 agents, including Claude Code, Codex, DSH, and WorkBuddy. | - |
+| 10 | [firecrawl/firecrawl](https://github.com/firecrawl/firecrawl) | ≈+5,800 | 새로 진입 | AGPL-3.0 | Knowledge infrastructure to make your agents smarter. Search, scrape and access 550+ data providers through one API. | - |
 
 ## 빠진 곳
 
-- [Ebony-Vinyl/dsh-our-free-model](https://github.com/Ebony-Vinyl/dsh-our-free-model) · 지난주 2위 (이번 주 +114)
-- [janestreet/agent_skills](https://github.com/janestreet/agent_skills) · 지난주 4위 (이번 주 +14)
-- [ccch1mneyyy/dsh-Go](https://github.com/ccch1mneyyy/dsh-Go) · 지난주 5위 (이번 주 +64)
-- [yetone/magpie](https://github.com/yetone/magpie) · 지난주 6위 (이번 주 +39)
-- [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) · 지난주 7위 (이번 주 +47)
-- [vercel-labs/ui](https://github.com/vercel-labs/ui) · 지난주 8위 (이번 주 +21)
-- [stablyai/orca](https://github.com/stablyai/orca) · 지난주 9위 (이번 주 +103)
-- [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) · 지난주 10위 (이번 주 +60)
+- [janestreet/agent_skills](https://github.com/janestreet/agent_skills) · 지난주 4위 (이번 주 +1,300)
+- [ccch1mneyyy/dsh-Go](https://github.com/ccch1mneyyy/dsh-Go) · 지난주 5위 (이번 주 +5,800)
+- [yetone/magpie](https://github.com/yetone/magpie) · 지난주 6위 (이번 주 +3,500)
+- [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) · 지난주 7위 (이번 주 +4,300)
+- [vercel-labs/ui](https://github.com/vercel-labs/ui) · 지난주 8위 (이번 주 +1,900)
+- [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) · 지난주 10위 (이번 주 +5,500)
 
 ## 출처
 
