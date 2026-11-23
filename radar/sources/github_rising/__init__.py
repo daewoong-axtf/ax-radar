@@ -39,6 +39,21 @@ def _rebuild(cfg) -> None:
     render.write_site(cfg)
 
 
+def _carry_summaries(items: list[dict]) -> int:
+    """Reuse Korean summaries already written for the same repo in earlier reports."""
+    known: dict[str, dict] = {}
+    for rep in core.all_reports(1000):
+        for it in rep.get("items", []):
+            if it.get("one_liner"):
+                known[it["name"]] = {k: it.get(k) for k in SUMMARY_FIELDS}
+    n = 0
+    for it in items:
+        if not it.get("one_liner") and it["name"] in known:
+            it.update(known[it["name"]])
+            n += 1
+    return n
+
+
 def _latest() -> dict | None:
     reports = core.all_reports(1)
     return reports[-1] if reports else None
@@ -104,6 +119,7 @@ def run(command: str, cfg: dict, gh, args, log=print) -> dict | None:
         cur = core.load_snapshot(snaps[-1])
         rows, meta = core.compute_gains(cfg, gh, cur, as_of, log, until=until)
         top, dropped, prev = core.rank(cfg, rows, as_of)
+        _carry_summaries(top)
         report = {"date": as_of, "meta": meta,
                   "items": [{k: it.get(k) for k in ITEM_FIELDS} for it in top],
                   "dropped": dropped, "previous": prev["date"] if prev else None,
@@ -127,6 +143,9 @@ def run(command: str, cfg: dict, gh, args, log=print) -> dict | None:
         log(f"using today's snapshot ({len(cur['repos'])} repos)")
     rows, meta = core.compute_gains(cfg, gh, cur, today, log)
     top, dropped, prev = core.rank(cfg, rows, today)
+    carried = _carry_summaries(top)
+    if carried:
+        log(f"  reused Korean summaries for {carried} repos from earlier reports")
     mode = _mode(cfg)
     if mode == "api":
         summarize(top, gh, cfg, log)

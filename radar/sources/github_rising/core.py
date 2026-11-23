@@ -284,7 +284,7 @@ def compute_gains(cfg, gh: GitHub, cur: dict, today: str, log=print,
                 if coverage:
                     # GH Archive here is a small sample of all events: scale back up to an estimate
                     est = raw / coverage
-                    row["gain"] = int(round(est, -2 if est >= 1000 else -1))
+                    row["gain"] = min(int(round(est, -2 if est >= 1000 else -1)), row["stargazers_count"])
                     row["estimated"] = True
                 else:
                     row["gain"] = raw
