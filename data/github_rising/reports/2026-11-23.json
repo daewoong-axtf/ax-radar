@@ -246,6 +246,7 @@
  ],
  "meta": {
   "base_snapshot": null,
+  "bootstrap_failed": true,
   "candidates": 6,
   "since": "2026-11-16T13:28:44+09:00",
   "until": "2026-11-23T13:28:44+09:00",
