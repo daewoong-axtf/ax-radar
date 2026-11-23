@@ -252,6 +252,6 @@
   "until": "2026-11-23T13:28:44+09:00",
   "window_days": 7
  },
- "notified": false,
+ "notified": true,
  "previous": null
 }
