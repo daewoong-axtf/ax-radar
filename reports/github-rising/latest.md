@@ -12,9 +12,9 @@ TOP 시리즈 · 2026-11-23
 | 3 | [BaaRai/ARTEX](https://github.com/BaaRai/ARTEX) | ≈+12,100 | 새로 진입 | AGPL-3.0 | ARTEX - AI autonomous penetration testing system (English translation; upstream: Autumn-27/ARTEX, AGPL-3.0) | - |
 | 4 | [pingdotgg/t3code](https://github.com/pingdotgg/t3code) | ≈+11,200 | 지난주 3위 ▼1 | MIT | The best way to control Claude Code, Codex and more from any computer or phone | - |
 | 5 | [Ebony-Vinyl/dsh-our-free-model](https://github.com/Ebony-Vinyl/dsh-our-free-model) | ≈+10,400 | 지난주 2위 ▼3 | - | 在 dsh 里装上这个插件即可，无需登录、注册或填 API Key，就能使用包括 DeepSeek V4.1 Flash、Kimi K3 在内的前沿模型——完全免费，不限量。 All you do is install this plugin in dsh: no login, no sign-up, no API key — the frontier models are just there, DeepSeek V4.1 Flash and Kimi K3 among them. Completely free, with no usage cap. | 라이선스 표기 없음 |
-| 6 | [stablyai/orca](https://github.com/stablyai/orca) | ≈+9,400 | 지난주 9위 ▲3 | MIT | Orca lets you run a fleet of bots with your own subscription (e.g. Claude Code, Grok, Agy, Codex). Available on desktop, mobile and remote runtime. | - |
+| 6 | [stablyai/orca](https://github.com/stablyai/orca) | ≈+9,400 | 지난주 8위 ▲2 | MIT | Orca lets you run a fleet of bots with your own subscription (e.g. Claude Code, Grok, Agy, Codex). Available on desktop, mobile and remote runtime. | - |
 | 7 | [erkamyaman/rust-anything](https://github.com/erkamyaman/rust-anything) | +8,150 | 새로 진입 | MIT | Rewrite your whole app in Rust, one piece at a time, checked against the original's recorded behavior at every step. CLIs, HTTP servers and libraries in TypeScript, Python, C, Go, Ruby and Java. | - |
-| 8 | [mdiri-ai/SoduWork](https://github.com/mdiri-ai/SoduWork) | ≈+7,400 | 새로 진입 | MIT | The AI-native engine for teams and their agents. Multi-harness, multi-agent, self-hosted. | - |
+| 8 | [mdiri-ai/SoduWork](https://github.com/mdiri-ai/SoduWork) | ≈+6,838 | 새로 진입 | MIT | The AI-native engine for teams and their agents. Multi-harness, multi-agent, self-hosted. | - |
 | 9 | [nexu-io/openmotion](https://github.com/nexu-io/openmotion) | ≈+6,100 | 새로 진입 | Apache-2.0 | The open-source Claude Motion & CapCut alternative. Turn a reference video into editable motion graphics with your brand kit. Export MP4s for YouTube, YouTube Shorts, Instagram Reels, and TikTok. A full-stack agentic video studio with 300+ Motion.md guides and support for 22 agents, including Claude Code, Codex, DSH, and WorkBuddy. | - |
 | 10 | [firecrawl/firecrawl](https://github.com/firecrawl/firecrawl) | ≈+5,800 | 새로 진입 | AGPL-3.0 | Knowledge infrastructure to make your agents smarter. Search, scrape and access 550+ data providers through one API. | - |
 
@@ -24,7 +24,7 @@ TOP 시리즈 · 2026-11-23
 - [ccch1mneyyy/dsh-Go](https://github.com/ccch1mneyyy/dsh-Go) · 지난주 5위 (이번 주 +5,800)
 - [yetone/magpie](https://github.com/yetone/magpie) · 지난주 6위 (이번 주 +3,500)
 - [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) · 지난주 7위 (이번 주 +4,300)
-- [vercel-labs/ui](https://github.com/vercel-labs/ui) · 지난주 8위 (이번 주 +1,900)
+- [vercel-labs/ui](https://github.com/vercel-labs/ui) · 지난주 9위 (이번 주 +1,900)
 - [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) · 지난주 10위 (이번 주 +5,500)
 
 ## 출처
